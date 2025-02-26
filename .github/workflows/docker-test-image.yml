@@ -1,0 +1,23 @@
+name: Docker test CI
+
+on:
+  push:
+    branches: ['dev']
+  pull_request:
+    branches: ['dev']
+
+env:
+  IMAGE_NAME: bingusboingus
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build --pull --rm -f "dockerfiles/Dockerfile.test" --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" .
+      - name: Run tests
+        run: docker run bingusboingus npm run test

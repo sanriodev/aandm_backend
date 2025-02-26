@@ -1,0 +1,42 @@
+name: Docker Image Build
+
+on:
+  push:
+    branches: ['dev']
+
+env:
+  IMAGE_NAME: aandm_server_nest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build --pull --rm -f "dockerfiles/Dockerfile.prod" --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" .
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]') 
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+        # build repoUrl
+        # change all uppercase characters to lowercase
+        # strip git ref prefix from version
+        # strip v prefix from tag name
+        # zse Docker:latest tag convention

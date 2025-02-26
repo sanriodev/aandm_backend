@@ -1,0 +1,31 @@
+# NestJS default dockerfile
+FROM node:18-alpine as builder
+
+ENV NODE_ENV build
+
+USER node
+WORKDIR /home/node
+
+COPY ./package*.json /home/node/
+
+RUN npm ci 
+
+COPY --chown=node:node . /home/node
+RUN npm run build \
+    && npm prune --production
+
+# ---
+
+FROM node:18-alpine
+
+ENV NODE_ENV production
+
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node --from=builder /home/node/package*.json /home/node/
+COPY --chown=node:node --from=builder /home/node/node_modules/ /home/node/node_modules/
+COPY --chown=node:node --from=builder /home/node/dist/ /home/node/dist/
+COPY --chown=node:node --from=builder /home/node/src/assets/ /home/node/src/assets/
+
+CMD ["node", "dist/main"]
