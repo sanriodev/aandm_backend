@@ -1,15 +1,16 @@
-name: Docker Image Build
+name: Docker build Release Image
 
 on:
-  push:
-    branches: ['dev']
+  release:
+    types: [created]
 
 env:
-  IMAGE_NAME: aandm_server_nest
+  IMAGE_NAME: aandm_backend
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-release-image:
+    runs-on: self-hosted
+
     permissions:
       packages: write
       contents: read
@@ -17,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: docker build --pull --rm -f "dockerfiles/Dockerfile.prod" --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" .
+        run: docker build --pull --rm -f "dockerfiles/Dockerfile.build" --tag $IMAGE_NAME --platform linux/arm64 --label "runnumber=${GITHUB_RUN_ID}" .
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
       - name: Push image
@@ -35,8 +36,7 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-        # build repoUrl
-        # change all uppercase characters to lowercase
-        # strip git ref prefix from version
-        # strip v prefix from tag name
-        # zse Docker:latest tag convention
+          if [[ $VERSION =~ ^[0-9]+.[0-9]+.[0-9]+$ ]]; then
+            docker tag $IMAGE_ID:$VERSION $IMAGE_ID:latest
+            docker push $IMAGE_ID:latest
+          fi
