@@ -11,6 +11,5 @@ RUN npm ci
 
 COPY ./src /home/node/src
 COPY ./tsconfig.json /home/node/tsconfig.json
-COPY ./.prettierrc.json /home/node/.prettierrc.json
 
 ENTRYPOINT [""]
