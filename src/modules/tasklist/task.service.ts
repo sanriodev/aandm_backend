@@ -1,11 +1,11 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UpdateTaskDto } from './dto/update-Task.dto';
 import { UnprocessableEntityException } from '@nestjs/common';
 import { TaskListDocument } from './schema/tasklist.schema';
 import { CreateTaskListDto } from './dto/create-tasklist.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { DeleteTaskDto } from './dto/delete-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 export class TaskService {
   constructor(
