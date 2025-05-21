@@ -28,14 +28,14 @@ export class NoteService {
   }
 
   async getById(id: string): Promise<NoteDocument> {
-    return await this.noteModel.findOne({ _id: id });
+    return await this.noteModel.findOne({ id: id });
   }
 
   async update(dto: UpdateNoteDto): Promise<NoteDocument> {
-    return await this.noteModel.findOneAndUpdate({ _id: dto._id }, dto);
+    return await this.noteModel.findOneAndUpdate({ id: dto._id }, dto);
   }
 
   async deleteById(id: string): Promise<NoteDocument> {
-    return await this.noteModel.findOneAndDelete({ _id: id });
+    return await this.noteModel.findOneAndDelete({ id: id });
   }
 }

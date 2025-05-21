@@ -4,7 +4,7 @@ import { ITaskList } from '../interface/tasklist.interface';
 
 @Schema()
 export class TaskList implements ITaskList {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   _id: string;
 
   @Prop({ required: true })

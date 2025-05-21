@@ -11,8 +11,8 @@ import {
   Body,
   UnprocessableEntityException,
   Param,
-  Patch,
   Delete,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -91,7 +91,7 @@ export class TaskController {
     return ReS.FromData(await this.taskService.getById(id));
   }
 
-  @Patch('/task')
+  @Put('/task')
   @UseInterceptors(ClassSerializerInterceptor)
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   @ApiOperation({

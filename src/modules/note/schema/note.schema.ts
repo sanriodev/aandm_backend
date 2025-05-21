@@ -3,7 +3,7 @@ import { INote } from '../interface/note.interface';
 
 @Schema()
 export class Note implements INote {
-  @Prop({ required: true, unique: true, index: true })
+  @Prop({ required: true, unique: true })
   _id: string;
 
   @Prop({ required: true })
