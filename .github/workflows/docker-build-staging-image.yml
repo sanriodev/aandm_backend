@@ -9,7 +9,7 @@ env:
 
 jobs:
   build-staging-image:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     permissions:
       packages: write
