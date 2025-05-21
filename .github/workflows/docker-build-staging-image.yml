@@ -1,0 +1,54 @@
+name: Docker build Staging Image
+
+on:
+  push:
+    branches: ['dev']
+
+env:
+  IMAGE_NAME: aandm_backend
+
+jobs:
+  build-staging-image:
+    runs-on: self-hosted
+
+    permissions:
+      packages: write
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build --pull --rm -f "dockerfiles/Dockerfile.build" --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" .
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      - name: Tag image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]') 
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          docker tag $IMAGE_NAME $IMAGE_ID:staging
+      ## container scanning, this does not work yet, we would need an github app integration...
+      - name: Scan Container for security vulnerabilities
+        uses: anchore/scan-action@v6
+        id: scan
+        with:
+          image: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:staging
+          fail-build: false
+          severity-cutoff: critical
+          output-file: ${{ github.workspace }}/anchore-scan_${{ github.run_id }}.sarif
+          output-format: sarif
+      - name: Upload Container Scanning SARIF Report
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        with:
+          sarif_file: ${{ github.workspace }}/anchore-scan_${{ github.run_id }}.sarif
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push image
+        run: |
+          docker push $IMAGE_ID:staging
