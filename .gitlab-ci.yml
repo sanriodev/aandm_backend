@@ -31,7 +31,7 @@ build_test_image:
     - merge_requests
   script:
     - docker build -f dockerfiles/Dockerfile.test --build-arg UserID=$(id -u) -t git.blvckleg.dev:5050/personal/aandm_backend:test .
-    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:test
+    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test
 
 test_test_image:
   stage: test
@@ -43,10 +43,10 @@ test_test_image:
     - merge_requests
   script:
     - mkdir artifacts
-    - docker run git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run lint
-    - docker run -v "$(pwd)"/artifacts:/home/runner/artifacts git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run test
+    - docker run git.blvckleg.dev:5050/personal/aandm_backend:test npm run lint
+    - docker run -v "$(pwd)"/artifacts:/home/runner/artifacts git.blvckleg.dev:5050/personal/aandm_backend:test npm run test
   after_script:
-    - docker image rm -f git.blvckleg.dev:5050/personal/aandm_backend:test:test
+    - docker image rm -f git.blvckleg.dev:5050/personal/aandm_backend:test
   artifacts:
     name: 'tests-and-coverage'
     when: on_success
