@@ -12,16 +12,13 @@ variables:
   OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
 
 before_script:
-  # Use a local, writable docker config to avoid macOS Keychain
-  - export DOCKER_CONFIG="$CI_PROJECT_DIR/.docker"
-  - mkdir -p "$DOCKER_CONFIG"
-  - printf '{"credsStore":""}\n' > "$DOCKER_CONFIG/config.json"
-  - echo "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
-
+  # Inline Docker auth (no docker login, no Keychain)
+  - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' "$CI_REGISTRY" "$(printf 'gitlab-ci-token:%s' "$CI_JOB_TOKEN" | base64 | tr -d '\n')")"
 
 .override_stage:
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # Same inline auth here too
+    - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' "$CI_REGISTRY" "$(printf 'gitlab-ci-token:%s' "$CI_JOB_TOKEN" | base64 | tr -d '\n')")"
     # replace host url in .env file with corresponding url of stage
     - sed -ie "s/XXX_TRAEFIK_HOST_URL_XXX/$TRAEFIK_HOST_URL/g" ./.env
     # override tag names if present
