@@ -1,15 +1,19 @@
-# TEST DOCKERFILE
-FROM node:18-alpine as builder
+FROM node:22-alpine AS builder
 
-ENV NODE_ENV build
+ENV NODE_ENV=build
 
-USER node
-WORKDIR /home/node
+ARG UserID
+RUN adduser -u $UserID -h /home/runner -D -s /bin/ash runner
+USER $UserID
+WORKDIR /home/runner
 
-COPY ./package*.json /home/node/
+COPY ./package*.json /home/runner/
 RUN npm ci
 
-COPY ./src /home/node/src
-COPY ./tsconfig.json /home/node/tsconfig.json
+COPY ./src /home/runner/src
+COPY ./test /home/runner/test
+COPY ./tsconfig.json /home/runner/tsconfig.json
+COPY ./.eslintrc.js /home/runner/.eslintrc.js
+COPY ./.prettierrc /home/runner/.prettierrc
 
 ENTRYPOINT [""]

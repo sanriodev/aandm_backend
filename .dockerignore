@@ -1,19 +1,5 @@
 
-## will not show up on git changes
-## everything that's compiled
-
-dist/
-
-## node libs
-
-node_modules/
-
-## dotenv environment file(s)
-
-.env*
-!.env.sample*
-
-tsconfig.tsbuildinfo
+node_modules
+dist
 tsconfig.build.tsbuildinfo
-bingusboingus.code-workspace
-.vscode/settings.*
+.gitlab-ci.yml
