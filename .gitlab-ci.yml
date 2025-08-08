@@ -57,6 +57,8 @@ build_staging_image:
   stage: build
   only:
     - dev
+  needs:
+    - test_test_image
   script:
     - docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:staging .
     - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:staging
