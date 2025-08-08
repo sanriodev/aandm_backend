@@ -12,7 +12,7 @@ variables:
   OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
 
 before_script:
-  - sudo docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 .override_stage:
   before_script:
@@ -28,8 +28,8 @@ build_test_image:
     - dev
     - merge_requests
   script:
-    - sudo docker build -f dockerfiles/Dockerfile.test --build-arg UserID=$(id -u) -t git.blvckleg.dev:5050/personal/aandm_backend:test .
-    - sudo docker push git.blvckleg.dev:5050/personal/aandm_backend:test:test
+    - docker build -f dockerfiles/Dockerfile.test --build-arg UserID=$(id -u) -t git.blvckleg.dev:5050/personal/aandm_backend:test .
+    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:test
 
 test_test_image:
   stage: test
@@ -41,10 +41,10 @@ test_test_image:
     - merge_requests
   script:
     - mkdir artifacts
-    - sudo docker run git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run lint
-    - sudo docker run -v "$(pwd)"/artifacts:/home/runner/artifacts git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run test
+    - docker run git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run lint
+    - docker run -v "$(pwd)"/artifacts:/home/runner/artifacts git.blvckleg.dev:5050/personal/aandm_backend:test:test npm run test
   after_script:
-    - sudo docker image rm -f git.blvckleg.dev:5050/personal/aandm_backend:test:test
+    - docker image rm -f git.blvckleg.dev:5050/personal/aandm_backend:test:test
   artifacts:
     name: 'tests-and-coverage'
     when: on_success
@@ -62,8 +62,8 @@ build_staging_image:
   needs:
     - test_test_image
   script:
-    - sudo docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:staging .
-    - sudo docker push git.blvckleg.dev:5050/personal/aandm_backend:test:staging
+    - docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:staging .
+    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:staging
 
 build_release_image:
   stage: release
@@ -73,5 +73,5 @@ build_release_image:
     - branches
   when: manual
   script:
-    - sudo docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG} .
-    - sudo docker push git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG}
+    - docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG} .
+    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG}
