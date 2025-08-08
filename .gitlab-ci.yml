@@ -12,7 +12,12 @@ variables:
   OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
 
 before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  # Use a local, writable docker config to avoid macOS Keychain
+  - export DOCKER_CONFIG="$CI_PROJECT_DIR/.docker"
+  - mkdir -p "$DOCKER_CONFIG"
+  - printf '{"credsStore":""}\n' > "$DOCKER_CONFIG/config.json"
+  - echo "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
+
 
 .override_stage:
   before_script:
