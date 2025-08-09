@@ -20,10 +20,7 @@ build_test_image:
   extends: .before_docker
   only: [dev, merge_requests]
   script:
-    - docker buildx build -f dockerfiles/Dockerfile.test \
-        -t "$CI_REGISTRY_IMAGE:test" \
-        --push \
-        .
+    - docker buildx build -f dockerfiles/Dockerfile.test -t "$CI_REGISTRY_IMAGE:test" --push .
 
 test_test_image:
   stage: test
@@ -52,10 +49,7 @@ build_staging_image:
   only: [dev]
   needs: [test_test_image]
   script:
-    - docker buildx build -f dockerfiles/Dockerfile \
-        -t "$CI_REGISTRY_IMAGE:staging" \
-        --push \
-        .
+    - docker buildx build -f dockerfiles/Dockerfile -t "$CI_REGISTRY_IMAGE:staging" --push .
 
 build_release_image:
   stage: release
@@ -63,7 +57,4 @@ build_release_image:
   only: [tags]
   when: manual
   script:
-    - docker buildx build -f dockerfiles/Dockerfile \
-        -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" \
-        --push \
-        .
+    - docker buildx build -f dockerfiles/Dockerfile -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push .
