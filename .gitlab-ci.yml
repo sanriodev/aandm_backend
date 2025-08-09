@@ -20,7 +20,7 @@ build_test_image:
   extends: .before_docker
   only: [dev, merge_requests]
   script:
-    - docker buildx build -f dockerfiles/Dockerfile.test -t "$CI_REGISTRY_IMAGE:test" --push .
+    - docker buildx build -f dockerfiles/Dockerfile.test -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u)
 
 test_test_image:
   stage: test

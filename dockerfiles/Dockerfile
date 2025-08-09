@@ -7,13 +7,6 @@ WORKDIR /home/node
 
 COPY ./package*.json /home/node/
 
-#### AUTH TOKEN 
-ARG NPM_ACCESS_TOKEN
-ARG NPM_REGISTRY_EP
-RUN npm config set @ematric:registry 'https:${NPM_REGISTRY_EP}'
-RUN npm config set -- '${NPM_REGISTRY_EP}:_authToken' '${NPM_ACCESS_TOKEN}'
-####
-
 RUN npm ci 
 
 COPY --chown=node:node . /home/node
