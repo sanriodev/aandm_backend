@@ -5,29 +5,15 @@ default:
 
 variables:
   OUTPUT_PATH: "$CI_PROJECT_DIR/artifacts"
-  DOCKER_BUILDKIT: "1"                     # modern builder
+  DOCKER_BUILDKIT: "1"
 
 .before_docker:
   before_script:
-    # Use a local Docker config so macOS Keychain isn't used
-    - export DOCKER_CONFIG="$CI_PROJECT_DIR/.docker"
-    - mkdir -p "$DOCKER_CONFIG"
-    - printf '{"credsStore":""}\n' > "$DOCKER_CONFIG/config.json"
-
-    # Inline auth (no docker login, no keychain)
-    - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' \
-        "$CI_REGISTRY" \
-        "$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')")"
-
-    # Buildx (stable + can push directly)
-    - docker buildx create --use --name ci-builder || docker buildx use ci-builder
-
-.override_stage:
-  extends: .before_docker
-  before_script:
-    - !reference [.before_docker, before_script]
-    - sed -ie "s/XXX_TRAEFIK_HOST_URL_XXX/$TRAEFIK_HOST_URL/g" ./.env
-    - sed -ie "s/XXX_CI_COMMIT_TAG_XXX/$CI_COMMIT_TAG/g" ./.env
+    # Auth using the built-in CI token (no Keychain touched)
+    - echo "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
+    # Ensure buildx is usable (runner already has plugin installed)
+    - docker buildx create --name ci-builder --use || docker buildx use ci-builder
+    - docker buildx version
 
 build_test_image:
   stage: build
@@ -62,7 +48,7 @@ test_test_image:
 
 build_staging_image:
   stage: staging
-  extends: .override_stage
+  extends: .before_docker
   only: [dev]
   needs: [test_test_image]
   script:
@@ -73,7 +59,7 @@ build_staging_image:
 
 build_release_image:
   stage: release
-  extends: .override_stage
+  extends: .before_docker
   only: [tags]
   when: manual
   script:
