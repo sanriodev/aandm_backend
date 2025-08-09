@@ -1,83 +1,83 @@
-stages:
-  - build
-  - test
-  - staging
-  - release
+stages: [build, test, staging, release]
 
 default:
-  tags:
-    - docker-build-01
+  tags: [docker-build-01]
 
 variables:
-  OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
+  OUTPUT_PATH: "$CI_PROJECT_DIR/artifacts"
+  DOCKER_BUILDKIT: "1"                     # modern builder
 
-before_script:
-  - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' \
-      "$CI_REGISTRY" \
-      "$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')")"
+.before_docker:
+  before_script:
+    # Use a local Docker config so macOS Keychain isn't used
+    - export DOCKER_CONFIG="$CI_PROJECT_DIR/.docker"
+    - mkdir -p "$DOCKER_CONFIG"
+    - printf '{"credsStore":""}\n' > "$DOCKER_CONFIG/config.json"
 
+    # Inline auth (no docker login, no keychain)
+    - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' \
+        "$CI_REGISTRY" \
+        "$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')")"
+
+    # Buildx (stable + can push directly)
+    - docker buildx create --use --name ci-builder || docker buildx use ci-builder
 
 .override_stage:
+  extends: .before_docker
   before_script:
-    - export DOCKER_AUTH_CONFIG="$(printf '{"auths":{"%s":{"auth":"%s"}}}' \
-      "$CI_REGISTRY" \
-      "$(printf '%s:%s' "$CI_REGISTRY_USER" "$CI_REGISTRY_PASSWORD" | base64 | tr -d '\n')")"
-
-    # replace host url in .env file with corresponding url of stage
+    - !reference [.before_docker, before_script]
     - sed -ie "s/XXX_TRAEFIK_HOST_URL_XXX/$TRAEFIK_HOST_URL/g" ./.env
-    # override tag names if present
     - sed -ie "s/XXX_CI_COMMIT_TAG_XXX/$CI_COMMIT_TAG/g" ./.env
 
 build_test_image:
   stage: build
-  only:
-    - dev
-    - merge_requests
+  extends: .before_docker
+  only: [dev, merge_requests]
   script:
-    - docker build -f dockerfiles/Dockerfile.test --build-arg UserID=$(id -u) -t git.blvckleg.dev:5050/personal/aandm_backend:test .
-    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test
+    - docker buildx build -f dockerfiles/Dockerfile.test \
+        -t "$CI_REGISTRY_IMAGE:test" \
+        --push \
+        .
 
 test_test_image:
   stage: test
-  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  needs:
-    - build_test_image
-  only:
-    - dev
-    - merge_requests
+  extends: .before_docker
+  needs: [build_test_image]
+  only: [dev, merge_requests]
   script:
-    - mkdir artifacts
-    - docker run git.blvckleg.dev:5050/personal/aandm_backend:test npm run lint
-    - docker run -v "$(pwd)"/artifacts:/home/runner/artifacts git.blvckleg.dev:5050/personal/aandm_backend:test npm run test
+    - mkdir -p artifacts
+    - docker run --rm "$CI_REGISTRY_IMAGE:test" npm run lint
+    - docker run --rm -v "$PWD/artifacts:/home/runner/artifacts" "$CI_REGISTRY_IMAGE:test" npm run test
   after_script:
-    - docker image rm -f git.blvckleg.dev:5050/personal/aandm_backend:test
+    - docker image rm -f "$CI_REGISTRY_IMAGE:test" || true
   artifacts:
-    name: 'tests-and-coverage'
+    name: "tests-and-coverage"
     when: on_success
     reports:
       junit:
-        - $OUTPUT_PATH/tests/junit-test-results.xml
+        - "$OUTPUT_PATH/tests/junit-test-results.xml"
       coverage_report:
         coverage_format: cobertura
-        path: $OUTPUT_PATH/coverage/cobertura-coverage.xml
+        path: "$OUTPUT_PATH/coverage/cobertura-coverage.xml"
 
 build_staging_image:
   stage: staging
-  only:
-    - dev
-  needs:
-    - test_test_image
+  extends: .override_stage
+  only: [dev]
+  needs: [test_test_image]
   script:
-    - docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:staging .
-    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:staging
+    - docker buildx build -f dockerfiles/Dockerfile \
+        -t "$CI_REGISTRY_IMAGE:staging" \
+        --push \
+        .
 
 build_release_image:
   stage: release
-  only:
-    - tags
-  except:
-    - branches
+  extends: .override_stage
+  only: [tags]
   when: manual
   script:
-    - docker build -f dockerfiles/Dockerfile -t git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG} .
-    - docker push git.blvckleg.dev:5050/personal/aandm_backend:test:${CI_COMMIT_TAG}
+    - docker buildx build -f dockerfiles/Dockerfile \
+        -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" \
+        --push \
+        .
