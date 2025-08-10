@@ -5,7 +5,6 @@ import {
   Put,
   Param,
   Body,
-  UseGuards,
   ClassSerializerInterceptor,
   UseInterceptors,
   UsePipes,
