@@ -11,9 +11,6 @@ variables:
   before_script:
     # Auth using the built-in CI token (no Keychain touched)
     - echo "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u gitlab-ci-token --password-stdin
-    # Ensure buildx is usable (runner already has plugin installed)
-    - docker buildx create --name ci-builder --use || docker buildx use ci-builder
-    - docker buildx version
 
 build_test_image:
   stage: build
