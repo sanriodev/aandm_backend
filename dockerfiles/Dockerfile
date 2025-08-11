@@ -25,7 +25,7 @@ COPY --chown=node:node --from=builder /home/node/package*.json /home/node/
 COPY --chown=node:node --from=builder /home/node/node_modules/ /home/node/node_modules/
 COPY --chown=node:node --from=builder /home/node/dist/ /home/node/dist/
 COPY --chown=node:node --from=builder /home/node/src/migrations /home/node/src/migrations
-COPY --chown=node:node --from=builder /home/node/src/config/database /home/node/src/config/database
+COPY --chown=node:node --from=builder /home/node/src/config/mongo /home/node/src/config/mongo
 COPY --chown=node:node --from=builder /home/node/entrypoint.sh /home/node/entrypoint.sh
 COPY --chown=node:node --from=builder /home/node/tsconfig.typeorm.json /home/node/tsconfig.typeorm.json
 
