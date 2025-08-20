@@ -3,8 +3,8 @@ import { Reflector } from '@nestjs/core';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppConfigService } from './config/app/app-config.service';
 import { ErrorFilter } from './common/filters/error.filter';
+import { AppConfigService } from '@Personal/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,7 +20,7 @@ async function bootstrap() {
   bootstrapSwagger(app);
   await app.startAllMicroservices();
 
-  await app.listen(appConfig.appPort);
+  await app.listen(appConfig.port);
 }
 
 async function bootstrapSwagger(app: INestApplication) {
