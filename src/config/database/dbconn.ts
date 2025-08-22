@@ -1,5 +1,5 @@
 export default {
-  type: process.env.SQL_TYPE ?? 'mariadb',
+  type: process.env.SQL_TYPE ?? 'postgres',
   host: process.env.SQL_HOST,
   port: Number(process.env.SQL_PORT),
   username: process.env.SQL_USER,

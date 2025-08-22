@@ -45,7 +45,7 @@ import dbconn from './dbconn';
           value: dbconn.logging,
         },
         type: {
-          joi: Joi.string().default('mariadb'),
+          joi: Joi.string().default('postgres'),
           value: dbconn.type,
         },
       }),
