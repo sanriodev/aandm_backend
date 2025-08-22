@@ -16,7 +16,7 @@ const ENV = process.env.NODE_ENV;
     }),
 
     AppConfigModule,
-    UserAuthModule,
+    UserAuthModule.registerAsync({}),
     HealthModule,
     DatabaseProviderModule,
   ],
