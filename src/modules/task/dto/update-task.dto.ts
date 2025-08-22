@@ -1,9 +1,15 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { ITask } from '../interface/task.interface';
-import { ApiProperty } from '@nestjs/swagger';
-import { boolean } from 'joi';
 
-export class TaskDto implements ITask {
+export class UpdateTaskDto implements ITask {
+  @ApiProperty({
+    example: '1',
+    description: 'The id of the task',
+    required: true,
+  })
+  id: number;
+
   @ApiProperty({
     description: 'Title of the task',
     required: true,
@@ -17,14 +23,14 @@ export class TaskDto implements ITask {
     required: true,
     type: String,
   })
-  @IsNotEmpty()
+  @IsOptional()
   content: string;
 
   @ApiProperty({
-    description: 'state of the task',
+    description: 'if the task is done',
     required: true,
-    type: boolean,
+    type: String,
   })
   @IsOptional()
-  isDone: boolean = false;
+  isDone: boolean;
 }

@@ -1,4 +1,20 @@
-import { OmitType } from '@nestjs/swagger';
-import { NoteDto } from './note.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
-export class CreateNoteDto extends OmitType(NoteDto, ['_id'] as const) {}
+export class CreateNoteDto {
+  @ApiProperty({
+    description: 'id of the user',
+    required: true,
+    type: String,
+  })
+  @IsNotEmpty()
+  userId: string;
+
+  @ApiProperty({
+    description: 'Title of the note',
+    required: true,
+    type: String,
+  })
+  @IsNotEmpty()
+  title: string;
+}
