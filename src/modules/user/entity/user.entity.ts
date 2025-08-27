@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  JoinTable,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from '../../role/entity/role.entity';
 
 @Entity()
@@ -30,24 +36,34 @@ export class User {
   @Column()
   salt: string;
 
+  @Column({
+    type: 'text',
+    array: true,
+    nullable: true,
+    default: () => 'ARRAY[]::text[]',
+  })
   permissions: string[];
 
   @Column({
+    type: 'text',
+    array: true,
     nullable: false,
-    default: [],
-    length: 2048,
+    default: () => 'ARRAY[]::text[]',
   })
   refreshTokens: string[];
 
   @Column({
+    type: 'text',
+    array: true,
     nullable: false,
-    default: [],
-    length: 2048,
+    default: () => 'ARRAY[]::text[]',
   })
   appTokens: string[];
 
+  @Column({ type: 'text', nullable: true })
   navPermissions: string;
 
-  @OneToMany(() => Role, (role) => role.users)
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
   roles: Role[];
 }

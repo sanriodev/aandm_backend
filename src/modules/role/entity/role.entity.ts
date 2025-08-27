@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../user/entity/user.entity';
 
 @Entity()
@@ -13,23 +13,31 @@ export class Role {
   roleName: string;
 
   @Column({
-    length: 2048,
+    type: 'text',
+    array: true,
     nullable: false,
-    default: '[]',
+    default: () => 'ARRAY[]::text[]',
   })
   accessPermissions: string[];
 
   @Column({
-    length: 2048,
+    type: 'text',
+    array: true,
     nullable: false,
-    default: '[]',
+    default: () => 'ARRAY[]::text[]',
   })
   navPermissions: string[];
 
+  @Column({
+    type: 'text',
+    array: true,
+    nullable: false,
+    default: () => 'ARRAY[]::text[]',
+  })
   appPermissions: string[];
 
   // ------------------- ASSOCIATIONS --------------------
 
-  @OneToMany(() => User, (user) => user.roles)
+  @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 }

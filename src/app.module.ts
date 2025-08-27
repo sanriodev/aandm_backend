@@ -18,7 +18,7 @@ const ENV = process.env.NODE_ENV;
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
       isGlobal: true,
     }),
-
+    DatabaseProviderModule,
     AppConfigModule,
     RoleModule.registerAsync({
       useFactory: (roleService: DBRolesService) => roleService,
@@ -33,7 +33,6 @@ const ENV = process.env.NODE_ENV;
       imports: [DBUserModule],
     }),
     // HealthModule,
-    DatabaseProviderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
