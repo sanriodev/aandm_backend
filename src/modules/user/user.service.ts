@@ -7,18 +7,18 @@ import {
   Role,
   User,
 } from '@personal/user-auth';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class DBUserService implements IUserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
-  update(id: string, user: IUpdateUserMessage): Promise<User> {
-    throw new Error('Method not implemented.');
+  async update(id: string, user: IUpdateUserMessage): Promise<User> {
+    return await this.userRepository.save({ id, ...user });
   }
-  findOneByUsernameWithPassword(username: string): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
+  async findOneByUsernameWithPassword(username: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { username } });
   }
   updateExternalUser(external: string, user: User, groups: string[], raw: any) {
     throw new Error('Method not implemented.');
@@ -26,34 +26,48 @@ export class DBUserService implements IUserService {
   createExternalUser(external: string, raw: any) {
     throw new Error('Method not implemented.');
   }
-  findOneByEmail(email: string): Promise<User> {
-    throw new Error('Method not implemented.');
+  async findOneByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { email } });
   }
-  findOneByUsername(username: string): Promise<User> {
-    throw new Error('Method not implemented.');
+  async findOneByUsername(username: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { username } });
   }
-  getAllByIds(ids: string[]): Promise<User[]> {
-    throw new Error('Method not implemented.');
+  async getAllByIds(ids: string[]): Promise<User[]> {
+    return await this.userRepository.find({ where: { id: In(ids) } });
   }
-  getById(id: string): User | Promise<User> {
-    throw new Error('Method not implemented.');
+  async getById(id: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
   }
-  getUsersByRoleIds(roleId: string[]): Promise<User[]> | User[] {
-    throw new Error('Method not implemented.');
+  async getUsersByRoleIds(roleId: string[]): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { roles: { id: In(roleId) } },
+    });
   }
   getByIdWithSelect(id: string, select: string): Promise<User> {
-    throw new Error('Method not implemented.');
+    return this.userRepository.findOne({
+      where: { id },
+      select: select.split(',').map((field) => field.trim() as keyof User),
+    });
   }
-  getUserRoles(user: User): Promise<Role[]> {
-    throw new Error('Method not implemented.');
+  async getUserRoles(user: User): Promise<Role[]> {
+    const u = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['roles'],
+    });
+    return u?.roles ?? [];
   }
-  create(createUserDto: ICreateUserMessage): Promise<User> {
-    throw new Error('Method not implemented.');
+  async create(createUserDto: ICreateUserMessage): Promise<User> {
+    return await this.userRepository.save(createUserDto);
   }
-  findAll(): Promise<User[]> | User[] {
-    throw new Error('Method not implemented.');
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
-  deleteIfDisabled(userId: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async deleteIfDisabled(userId: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user && user.status === 'inactive') {
+      await this.userRepository.delete(user.id);
+      return true;
+    }
+    return false;
   }
 }

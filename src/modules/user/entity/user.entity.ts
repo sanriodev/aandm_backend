@@ -21,7 +21,7 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column({ default: 'active' })
+  @Column({ nullable: false, default: 'active' })
   status: string;
 
   @Column({
