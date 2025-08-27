@@ -9,7 +9,7 @@ variables:
 .before_docker:
   before_script:
     # Auth using the built-in CI token (no Keychain touched)
-    - echo "$CI_JOB_TOKEN" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - echo "$CI_TOKEN" | docker login "$CI_REGISTRY" -u "$CI_USER" --password-stdin
 
 build_test_image:
   stage: build
