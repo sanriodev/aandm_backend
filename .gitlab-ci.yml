@@ -4,7 +4,7 @@ default:
   tags: [docker-build-01]
 
 variables:
-  OUTPUT_PATH: "$CI_PROJECT_DIR/artifacts"
+  OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
 
 .before_docker:
   before_script:
@@ -16,7 +16,7 @@ build_test_image:
   extends: .before_docker
   only: [dev, merge_requests]
   script:
-    - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u)
+    - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u) --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"
 
 test_test_image:
   stage: test
@@ -30,14 +30,14 @@ test_test_image:
   after_script:
     - docker image rm -f "$CI_REGISTRY_IMAGE:test" || true
   artifacts:
-    name: "tests-and-coverage"
+    name: 'tests-and-coverage'
     when: on_success
     reports:
       junit:
-        - "$OUTPUT_PATH/tests/junit-test-results.xml"
+        - '$OUTPUT_PATH/tests/junit-test-results.xml'
       coverage_report:
         coverage_format: cobertura
-        path: "$OUTPUT_PATH/coverage/cobertura-coverage.xml"
+        path: '$OUTPUT_PATH/coverage/cobertura-coverage.xml'
 
 build_staging_image:
   stage: staging
@@ -45,7 +45,7 @@ build_staging_image:
   only: [dev]
   needs: [test_test_image]
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push .
+    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"
 
 build_release_image:
   stage: release
@@ -53,4 +53,4 @@ build_release_image:
   only: [tags]
   when: manual
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push .
+    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"

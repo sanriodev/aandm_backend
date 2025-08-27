@@ -2,6 +2,14 @@ FROM node:22-alpine AS builder
 
 ENV NODE_ENV=build
 
+#### AUTH TOKEN 
+ARG NPM_ACCESS_TOKEN
+ARG NPM_REGISTRY_EP
+RUN npm config set @personal:registry 'https:${NPM_REGISTRY_EP}'
+RUN npm config set -- '${NPM_REGISTRY_EP}:_authToken' '${NPM_ACCESS_TOKEN}'
+RUN npm config set -- '//git.blvckleg.dev/api/v4/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
+####
+
 USER node
 WORKDIR /home/node
 
