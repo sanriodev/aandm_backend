@@ -12,7 +12,6 @@ import {
   UnprocessableEntityException,
   Param,
   Delete,
-  Put,
 } from '@nestjs/common';
 import {
   ApiBody,
