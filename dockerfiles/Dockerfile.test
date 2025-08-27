@@ -24,7 +24,7 @@ COPY ./test /home/runner/test
 COPY ./tsconfig.json /home/runner/tsconfig.json
 COPY ./.eslintrc.js /home/runner/.eslintrc.js
 COPY ./.prettierrc /home/runner/.prettierrc
-COPY --chown=node:node --from=builder /home/node/src/migrations /home/node/src/migrations
-COPY --chown=node:node --from=builder /home/node/src/config/database /home/node/src/config/database
+COPY ./src/migrations /home/runner/src/migrations
+COPY ./src/config/database /home/runner/src/config/database
 
 ENTRYPOINT [""]
