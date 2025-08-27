@@ -21,15 +21,16 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ReS } from '../../common/res.model';
-import { NoteDto } from './dto/note.dto';
 import { CreateNoteDto } from './dto/create-note.dto';
-import { NoteService } from './note.service';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { JWTAuthGuard, PermissionsGuard, ReS } from '@personal/common';
+import { Note } from './entity/note.entity';
+import { NoteService } from './note.service';
 
 @Controller('note')
 @ApiTags('note')
-@UseGuards()
+@UseGuards(PermissionsGuard)
+@UseGuards(JWTAuthGuard)
 @ApiExtraModels(ReS)
 @ApiResponse({ status: 403, description: 'Forbidden.' })
 export class NoteController {
@@ -44,7 +45,7 @@ export class NoteController {
     description: 'creates a new note',
   })
   @ApiBody({ type: CreateNoteDto })
-  async createOrUpdate(@Body() inputs: CreateNoteDto): Promise<ReS<NoteDto>> {
+  async createOrUpdate(@Body() inputs: CreateNoteDto): Promise<ReS<Note>> {
     try {
       return ReS.FromData(await this.noteService.create(inputs));
     } catch (error) {
@@ -58,8 +59,8 @@ export class NoteController {
     summary: 'get all notes',
     description: 'returns all notes',
   })
-  async getNotes(): Promise<ReS<NoteDto[]>> {
-    return ReS.FromData(await this.noteService.getAll());
+  async getNotes(): Promise<ReS<Note[]>> {
+    return ReS.FromData(await this.noteService.findMany({}));
   }
 
   @Get('/:id')
@@ -69,8 +70,8 @@ export class NoteController {
     summary: 'get a note',
     description: 'returns a note',
   })
-  async getNote(@Param('id') id: string): Promise<ReS<NoteDto>> {
-    return ReS.FromData(await this.noteService.getById(id));
+  async getNote(@Param('id') id: number): Promise<ReS<Note>> {
+    return ReS.FromData(await this.noteService.findOne(id, []));
   }
 
   @Put('/')
@@ -80,7 +81,7 @@ export class NoteController {
     summary: 'update note',
     description: 'updates a note',
   })
-  async updateNote(@Body() dto: UpdateNoteDto): Promise<ReS<NoteDto>> {
+  async updateNote(@Body() dto: UpdateNoteDto): Promise<ReS<Note>> {
     return ReS.FromData(await this.noteService.update(dto));
   }
 
@@ -91,7 +92,7 @@ export class NoteController {
     summary: 'delete note',
     description: 'deletes a note',
   })
-  async deleteNote(@Param('id') id: string): Promise<ReS<NoteDto>> {
-    return ReS.FromData(await this.noteService.deleteById(id));
+  async deleteNote(@Param('id') id: number): Promise<ReS<Note>> {
+    return ReS.FromData(await this.noteService.delete(id));
   }
 }

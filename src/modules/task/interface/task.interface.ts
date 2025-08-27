@@ -1,6 +1,6 @@
-export interface INote {
+export interface ITask {
   id: number;
   title: string;
-  userId: string;
   content?: string;
+  isDone: boolean;
 }

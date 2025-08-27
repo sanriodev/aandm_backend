@@ -7,6 +7,15 @@ RUN adduser -u $UserID -h /home/runner -D -s /bin/ash runner
 USER $UserID
 WORKDIR /home/runner
 
+#### AUTH TOKEN 
+ARG NPM_ACCESS_TOKEN
+ARG NPM_REGISTRY_EP
+RUN npm config set @personal:registry 'https:${NPM_REGISTRY_EP}'
+RUN npm config set -- '${NPM_REGISTRY_EP}:_authToken' '${NPM_ACCESS_TOKEN}'
+RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/20/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
+RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/19/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
+####
+
 COPY ./package*.json /home/runner/
 RUN npm ci
 
@@ -15,5 +24,7 @@ COPY ./test /home/runner/test
 COPY ./tsconfig.json /home/runner/tsconfig.json
 COPY ./.eslintrc.js /home/runner/.eslintrc.js
 COPY ./.prettierrc /home/runner/.prettierrc
+COPY ./src/migrations /home/runner/src/migrations
+COPY ./src/config/database /home/runner/src/config/database
 
 ENTRYPOINT [""]

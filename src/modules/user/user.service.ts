@@ -1,36 +1,73 @@
 import { Injectable } from '@nestjs/common';
-import { IUser } from './interface/user.interface';
-import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument } from './schema/user.schema';
-import { Model } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import {
+  ICreateUserMessage,
+  IUpdateUserMessage,
+  IUserService,
+  Role,
+  User,
+} from '@personal/user-auth';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
-export class UserService {
+export class DBUserService implements IUserService {
   constructor(
-    @InjectModel('User')
-    private readonly userModel: Model<UserDocument>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
-
-  async getUserByUsername(username: string): Promise<IUser | null> {
-    return await this.userModel.findOne({ username: username });
+  async update(id: string, user: IUpdateUserMessage): Promise<User> {
+    return await this.userRepository.save({ id, ...user });
   }
-
-  async createUser(user: CreateUserDto): Promise<IUser> {
-    const newUser = await this.userModel.create(user);
-    return await newUser.save();
+  async findOneByUsernameWithPassword(username: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { username } });
   }
-  async getAllUsers(): Promise<IUser[]> {
-    return await this.userModel.find();
+  updateExternalUser(external: string, user: User, groups: string[], raw: any) {
+    throw new Error('Method not implemented.');
   }
-  async getUserById(id: string): Promise<IUser | null> {
-    return await this.userModel.findById(id);
+  createExternalUser(external: string, raw: any) {
+    throw new Error('Method not implemented.');
   }
-  async updateUser(id: string, user: UpdateUserDto): Promise<IUser | null> {
-    return await this.userModel.findByIdAndUpdate(id, user, {
-      new: true,
-      runValidators: true,
+  async findOneByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+  async findOneByUsername(username: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { username } });
+  }
+  async getAllByIds(ids: string[]): Promise<User[]> {
+    return await this.userRepository.find({ where: { id: In(ids) } });
+  }
+  async getById(id: string): Promise<User> {
+    return await this.userRepository.findOne({ where: { id } });
+  }
+  async getUsersByRoleIds(roleId: string[]): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { roles: { id: In(roleId) } },
     });
+  }
+  getByIdWithSelect(id: string, select: string): Promise<User> {
+    return this.userRepository.findOne({
+      where: { id },
+      select: select.split(',').map((field) => field.trim() as keyof User),
+    });
+  }
+  async getUserRoles(user: User): Promise<Role[]> {
+    const u = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['roles'],
+    });
+    return u?.roles ?? [];
+  }
+  async create(createUserDto: ICreateUserMessage): Promise<User> {
+    return await this.userRepository.save(createUserDto);
+  }
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
+  }
+  async deleteIfDisabled(userId: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user && user.status === 'inactive') {
+      await this.userRepository.delete(user.id);
+      return true;
+    }
+    return false;
   }
 }

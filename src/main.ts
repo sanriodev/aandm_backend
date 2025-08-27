@@ -1,41 +1,98 @@
-import { INestApplication } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  INestApplication,
+  Logger,
+  ValidationPipe,
+} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AppConfigService } from './config/app/app-config.service';
-import { ErrorFilter } from './common/filters/error.filter';
+import { NestFactory, Reflector } from '@nestjs/core';
+import {
+  AppConfigService,
+  ErrorFilter,
+  MicroservicesService,
+  RequestScopeInterceptor,
+} from '@personal/common';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: true,
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-  });
+  const app = await NestFactory.create(AppModule);
+  const globalPrefix = 'api';
 
-  const appConfig: AppConfigService = app.get(AppConfigService);
-
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(globalPrefix);
+  app.enableVersioning();
   app.useGlobalFilters(new ErrorFilter());
-  app.useGlobalInterceptors(app.get(Reflector));
-  bootstrapSwagger(app);
-  await app.startAllMicroservices();
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector, {}));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      exceptionFactory: (errors) => {
+        const flatMessages: { p: string; msg: string }[] = [].concat(
+          errors.map((e) => ({
+            p: e.property,
+            msg: generateErrorMessage(e),
+          })),
+        );
+        return new BadRequestException({
+          message: 'Bad Request',
+          displayMessage: flatMessages.map((fm) => `${fm.msg}`).join('<br/>'),
+        });
+      },
+    }),
+  );
 
-  await app.listen(appConfig.appPort);
+  const appConfig = app.get(AppConfigService);
+  const microserviceService = app.get(MicroservicesService);
+
+  app.useGlobalInterceptors(new RequestScopeInterceptor());
+  const ENV = process.env.NODE_ENV;
+  if (ENV != 'production' && ENV != 'prod') {
+    bootstrapSwagger(app, microserviceService);
+  }
+  const port = appConfig.port || 3000;
+  await app.listen(port);
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
+  );
 }
 
-async function bootstrapSwagger(app: INestApplication) {
+function generateErrorMessage(e): string {
+  let ret = '';
+  ret += e.constraints ? Object.values(e.constraints).join('<br/>') : '';
+  if (e.children) {
+    (e.children as any[]).forEach((child, i) => {
+      if (e.constraints || i > 0) ret += '<br/>';
+      ret += generateErrorMessage(child);
+    });
+  }
+  return ret;
+}
+
+async function bootstrapSwagger(
+  app: INestApplication,
+  microserviceService: MicroservicesService,
+) {
   const config = new DocumentBuilder()
-    .setTitle('AandM API')
-    .setDescription('AandM REST API Documentation')
+    .setTitle('AandM')
+    .setDescription('AandM Backend API')
     .setVersion('1.0')
-    .setBasePath('api/v1')
+    .addBearerAuth()
+    .addServer(microserviceService.ingressUrl, 'Default Ingress')
     .build();
 
   const document = SwaggerModule.createDocument(app, config, {
     ignoreGlobalPrefix: false,
+    deepScanRoutes: true,
+    extraModels: [],
   });
 
   SwaggerModule.setup('api/v1/doc', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      urls: microserviceService.swaggerURLs,
+    },
+
     customSiteTitle: 'API Docs',
     explorer: true,
   } as unknown as any);

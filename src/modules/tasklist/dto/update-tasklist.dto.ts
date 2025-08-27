@@ -1,7 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
+import { ITaskList } from '../interface/tasklist.interface';
 
-export class CreateTaskListDto {
+export class UpdateTaskListDto implements ITaskList {
+  @ApiProperty({
+    example: '1',
+    description: 'The id of the tasklist',
+    required: true,
+  })
+  @IsNotEmpty()
+  id: number;
+
   @ApiProperty({
     example: 'Personal Tasks',
     description: 'The name of the tasklist',
@@ -15,6 +24,6 @@ export class CreateTaskListDto {
     description: 'The id of the user',
     required: true,
   })
-  @IsNotEmpty()
+  @IsOptional()
   userId: string;
 }
