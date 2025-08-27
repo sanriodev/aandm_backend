@@ -1,19 +1,59 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RmqService } from '@personal/common';
-import { IUserService, User } from '@personal/user-auth';
-import { AuthService } from '@personal/user-auth/src/auth/auth.service';
-import { TokenHandlingService } from '@personal/user-auth/src/auth/token-handling.service';
-import { UserService } from '@personal/user-auth/src/service/user.service';
+import {
+  ICreateUserMessage,
+  IUpdateUserMessage,
+  IUserService,
+  Role,
+  User,
+} from '@personal/user-auth';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class DBUserService extends UserService {
+export class DBUserService implements IUserService {
   constructor(
-    private readonly authService: AuthService,
-    private readonly rmqService: RmqService,
-    private readonly tokenService: TokenHandlingService,
-  ) {
-    super(this, authService, rmqService, tokenService);
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
+  update(id: string, user: IUpdateUserMessage): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  findOneByUsernameWithPassword(username: string): User | PromiseLike<User> {
+    throw new Error('Method not implemented.');
+  }
+  updateExternalUser(external: string, user: User, groups: string[], raw: any) {
+    throw new Error('Method not implemented.');
+  }
+  createExternalUser(external: string, raw: any) {
+    throw new Error('Method not implemented.');
+  }
+  findOneByEmail(email: string): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  findOneByUsername(username: string): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  getAllByIds(ids: string[]): Promise<User[]> {
+    throw new Error('Method not implemented.');
+  }
+  getById(id: string): User | Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  getUsersByRoleIds(roleId: string[]): Promise<User[]> | User[] {
+    throw new Error('Method not implemented.');
+  }
+  getByIdWithSelect(id: string, select: string): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  getUserRoles(user: User): Promise<Role[]> {
+    throw new Error('Method not implemented.');
+  }
+  create(createUserDto: ICreateUserMessage): Promise<User> {
+    throw new Error('Method not implemented.');
+  }
+  findAll(): Promise<User[]> | User[] {
+    throw new Error('Method not implemented.');
+  }
+  deleteIfDisabled(userId: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 }

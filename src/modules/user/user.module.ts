@@ -1,8 +1,11 @@
-// import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '@personal/user-auth';
+import { DBUserService } from './user.service';
 
-// @Module({
-//   imports: [DatabaseModule, DBRoleModule, AppConfigModule, MailServiceModule],
-//   providers: [DBUserService],
-//   exports: [DBUserService],
-// })
-// export class DBUserModule {}
+@Module({
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [DBUserService],
+  exports: [DBUserService],
+})
+export class DBUserModule {}

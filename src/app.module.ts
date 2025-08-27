@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { MicroserviceModule, UserAuthModule } from '@personal/user-auth';
-import { AppConfigModule, HealthModule } from '@personal/common';
+import { RoleModule, UserAuthModule } from '@personal/user-auth';
+import { AppConfigModule } from '@personal/common';
 import { DatabaseProviderModule } from './provider/provider.module';
 import { ConfigModule } from '@nestjs/config';
-import { UserService } from '@personal/user-auth/src/service/user.service';
+import { DBUserModule } from './modules/user/user.module';
+import { DBUserService } from './modules/user/user.service';
+import { DBRolesService } from './modules/role/role.service';
+import { DBRoleModule } from './modules/role/role.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -17,18 +20,19 @@ const ENV = process.env.NODE_ENV;
     }),
 
     AppConfigModule,
-    MicroserviceModule,
-    UserAuthModule.registerAsync({
-      inject: [UserService],
+    RoleModule.registerAsync({
+      useFactory: (roleService: DBRolesService) => roleService,
+      inject: [DBRolesService],
+      imports: [DBRoleModule],
     }),
-    // UserAuthModule.registerAsync({
-    //   useFactory: (configService: DBUserService) => {
-    //     return configService;
-    //   },
-    //   inject: [DBUserService],
-    //   imports: [DBUserModule],
-    // }),
-    HealthModule,
+    UserAuthModule.registerAsync({
+      useFactory: (configService: DBUserService) => {
+        return configService;
+      },
+      inject: [DBUserService],
+      imports: [DBUserModule],
+    }),
+    // HealthModule,
     DatabaseProviderModule,
   ],
   controllers: [AppController],
