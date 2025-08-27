@@ -14,7 +14,7 @@ export class TaskListService extends BaseDatabaseService<
   UpdateTaskListDto
 > {
   constructor(
-    @InjectRepository(Task)
+    @InjectRepository(TaskList)
     protected readonly taskListRepository: Repository<TaskList>,
   ) {
     super(taskListRepository);

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserAuthModule } from '@personal/user-auth';
-import { AppConfigModule, HealthModule } from '@personal/common';
+import { IUserService, UserAuthModule } from '@personal/user-auth';
+import { AppConfigModule, HealthModule, UserService } from '@personal/common';
 import { DatabaseProviderModule } from './provider/provider.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -16,7 +16,13 @@ const ENV = process.env.NODE_ENV;
     }),
 
     AppConfigModule,
-    UserAuthModule.registerAsync({}),
+    UserAuthModule.registerAsync({
+      useFactory: (configService: DBUserService) => {
+        return configService;
+      },
+      inject: [DBUserService],
+      imports: [DBUserModule],
+    }),
     HealthModule,
     DatabaseProviderModule,
   ],
