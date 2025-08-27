@@ -16,7 +16,7 @@ build_test_image:
   extends: .before_docker
   only: [dev, merge_requests]
   script:
-    - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u) --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"
+    - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u) --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
 
 test_test_image:
   stage: test
@@ -45,7 +45,7 @@ build_staging_image:
   only: [dev]
   needs: [test_test_image]
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"
+    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
 
 build_release_image:
   stage: release
@@ -53,4 +53,4 @@ build_release_image:
   only: [tags]
   when: manual
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_JOB_TOKEN}"
+    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
