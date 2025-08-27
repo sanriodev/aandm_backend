@@ -1,11 +1,12 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IRoleService, Role } from '@personal/user-auth';
+import { IRoleService } from '@personal/user-auth';
 import {
   CreateRoleDto,
   UpdateRoleDto,
 } from '@personal/user-auth/src/controller/v1/dto';
 import { In, Repository } from 'typeorm';
+import { Role } from './entity/role.entity';
 
 @Injectable()
 export class DBRolesService implements IRoleService {

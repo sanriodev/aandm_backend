@@ -2,8 +2,6 @@ import {
   Get,
   Post,
   Controller,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   UseGuards,
   ValidationPipe,
   UsePipes,
@@ -12,15 +10,21 @@ import {
   UnprocessableEntityException,
   Param,
   Delete,
+  Version,
 } from '@nestjs/common';
 import {
-  ApiBody,
+  ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JWTAuthGuard, PermissionsGuard, ReS } from '@personal/common';
+import {
+  JWTAuthGuard,
+  Permissions,
+  PermissionsGuard,
+  ReS,
+} from '@personal/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
@@ -34,55 +38,68 @@ import { Task } from './entity/task.entity';
 export class TaskController {
   constructor(
     @Inject(TaskService)
-    private readonly taskListService: TaskService,
+    private readonly taskService: TaskService,
   ) {}
 
   @Post('/')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:create')
   @ApiOperation({
-    summary: 'create taskList',
-    description: 'creates a new taskList',
+    summary: 'create a task',
+    description: 'creates a new task',
   })
-  @ApiBody({ type: CreateTaskDto })
-  async createTaskList(@Body() inputs: CreateTaskDto): Promise<ReS<Task>> {
+  async createTask(@Body() inputs: CreateTaskDto): Promise<ReS<Task>> {
     try {
-      return ReS.FromData(await this.taskListService.create(inputs));
+      return ReS.FromData(await this.taskService.create(inputs));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
     }
   }
 
   @Get('/')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:get:all')
   @ApiOperation({
-    summary: 'get all taskLists',
-    description: 'returns all taskLists',
+    summary: 'get all tasks',
+    description: 'returns all tasks',
   })
   async getTaskLists(): Promise<ReS<Task[]>> {
     return ReS.FromData(
-      await this.taskListService.findMany({ relations: ['tasks'] }),
+      await this.taskService.findMany({ relations: ['tasks'] }),
     );
   }
 
   @Get('/:id')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:get')
   @ApiOperation({
-    summary: 'get a taskList',
-    description: 'returns a taskList',
+    summary: 'get a task',
+    description: 'returns a task',
   })
   async getTaskList(@Param('id') id: number): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskListService.findOne(id, []));
+    return ReS.FromData(await this.taskService.findOne(id, []));
   }
 
   @Delete('/:id')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:delete')
   @ApiOperation({
-    summary: 'delete a taskList',
-    description: 'deletes a taskList',
+    summary: 'delete a task',
+    description: 'deletes a task',
   })
   async deleteTaskList(@Param('id') id: number): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskListService.delete(id));
+    return ReS.FromData(await this.taskService.delete(id));
   }
 }

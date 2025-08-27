@@ -1,3 +1,11 @@
+import { NestFactory, Reflector } from '@nestjs/core';
+import { AppModule } from './app.module';
+import {
+  AppConfigService,
+  ErrorFilter,
+  MicroservicesService,
+  RequestScopeInterceptor,
+} from '@personal/common';
 import {
   BadRequestException,
   ClassSerializerInterceptor,
@@ -6,14 +14,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { NestFactory, Reflector } from '@nestjs/core';
-import {
-  AppConfigService,
-  ErrorFilter,
-  MicroservicesService,
-  RequestScopeInterceptor,
-} from '@personal/common';
-import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -75,7 +75,7 @@ async function bootstrapSwagger(
 ) {
   const config = new DocumentBuilder()
     .setTitle('AandM')
-    .setDescription('AandM Backend API')
+    .setDescription('AandM API Documentation')
     .setVersion('1.0')
     .addBearerAuth()
     .addServer(microserviceService.ingressUrl, 'Default Ingress')

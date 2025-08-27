@@ -2,8 +2,6 @@ import {
   Get,
   Post,
   Controller,
-  UseInterceptors,
-  ClassSerializerInterceptor,
   UseGuards,
   ValidationPipe,
   UsePipes,
@@ -13,9 +11,10 @@ import {
   Param,
   Delete,
   Put,
+  Version,
 } from '@nestjs/common';
 import {
-  ApiBody,
+  ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
   ApiResponse,
@@ -23,7 +22,12 @@ import {
 } from '@nestjs/swagger';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
-import { JWTAuthGuard, PermissionsGuard, ReS } from '@personal/common';
+import {
+  JWTAuthGuard,
+  Permissions,
+  PermissionsGuard,
+  ReS,
+} from '@personal/common';
 import { Note } from './entity/note.entity';
 import { NoteService } from './note.service';
 
@@ -40,11 +44,15 @@ export class NoteController {
   ) {}
 
   @Post('/')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('note:create')
   @ApiOperation({
-    summary: 'create note',
+    summary: 'create a note',
     description: 'creates a new note',
   })
-  @ApiBody({ type: CreateNoteDto })
   async createOrUpdate(@Body() inputs: CreateNoteDto): Promise<ReS<Note>> {
     try {
       return ReS.FromData(await this.noteService.create(inputs));
@@ -53,8 +61,11 @@ export class NoteController {
     }
   }
   @Get('/')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('note:get:all')
   @ApiOperation({
     summary: 'get all notes',
     description: 'returns all notes',
@@ -64,8 +75,11 @@ export class NoteController {
   }
 
   @Get('/:id')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('note:get')
   @ApiOperation({
     summary: 'get a note',
     description: 'returns a note',
@@ -75,10 +89,13 @@ export class NoteController {
   }
 
   @Put('/')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('note:update')
   @ApiOperation({
-    summary: 'update note',
+    summary: 'update a note',
     description: 'updates a note',
   })
   async updateNote(@Body() dto: UpdateNoteDto): Promise<ReS<Note>> {
@@ -86,10 +103,13 @@ export class NoteController {
   }
 
   @Delete('/:id')
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Version('1')
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('note:delete')
   @ApiOperation({
-    summary: 'delete note',
+    summary: 'delete a note',
     description: 'deletes a note',
   })
   async deleteNote(@Param('id') id: number): Promise<ReS<Note>> {
