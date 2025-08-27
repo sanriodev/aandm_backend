@@ -39,14 +39,6 @@ export class User {
   @Column({
     type: 'text',
     array: true,
-    nullable: true,
-    default: () => 'ARRAY[]::text[]',
-  })
-  permissions: string[];
-
-  @Column({
-    type: 'text',
-    array: true,
     nullable: false,
     default: () => 'ARRAY[]::text[]',
   })
@@ -59,9 +51,6 @@ export class User {
     default: () => 'ARRAY[]::text[]',
   })
   appTokens: string[];
-
-  @Column({ type: 'text', nullable: true })
-  navPermissions: string;
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable({
