@@ -14,6 +14,8 @@ ARG NPM_ACCESS_TOKEN
 ARG NPM_REGISTRY_EP
 RUN npm config set @personal:registry 'https:${NPM_REGISTRY_EP}'
 RUN npm config set -- '${NPM_REGISTRY_EP}:_authToken' '${NPM_ACCESS_TOKEN}'
+RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/20/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
+RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/19/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
 ####
 COPY ./package*.json /home/node/
 
