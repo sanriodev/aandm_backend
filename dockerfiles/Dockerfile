@@ -2,9 +2,6 @@ FROM node:22-alpine AS builder
 
 ENV NODE_ENV=build
 
-# Build args (consider BuildKit secrets for tokens)
-ARG NPM_ACCESS_TOKEN
-ARG NPM_REGISTRY_EP
 
 USER node
 WORKDIR /home/node
