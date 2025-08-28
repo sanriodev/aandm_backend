@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ICreateUserMessage,
@@ -15,10 +15,11 @@ export class DBUserService implements IUserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async update(id: string, dto: IUpdateUserMessage): Promise<User> {
-    let entity = await this.userRepository.findOne({ where: { id: id } });
+    const entity = await this.userRepository.findOne({ where: { id } });
     delete dto.roles;
-    entity = { ...entity, ...dto };
-    return await this.userRepository.save(entity);
+    if (!entity) throw new UnprocessableEntityException('User not found');
+    dto.id = entity.id;
+    return await this.userRepository.save(dto, { reload: true });
   }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
     return await this.userRepository.findOne({

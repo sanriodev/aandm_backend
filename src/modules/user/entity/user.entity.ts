@@ -6,11 +6,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role } from '../../role/entity/role.entity';
+import { User as IUser } from '@personal/user-auth';
 
 @Entity()
-export class User {
+export class User extends IUser {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: string;
 
   @Column({ nullable: false, unique: false })
   firstName: string;
