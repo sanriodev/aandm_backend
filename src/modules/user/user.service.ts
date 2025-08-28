@@ -14,9 +14,11 @@ export class DBUserService implements IUserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
-  async update(id: string, user: IUpdateUserMessage): Promise<User> {
-    await this.userRepository.update(id, user as any);
-    return this.userRepository.findOne({ where: { id } });
+  async update(id: string, dto: IUpdateUserMessage): Promise<User> {
+    let entity = await this.userRepository.findOne({ where: { id: id } });
+    delete dto.roles;
+    entity = { ...entity, ...dto };
+    return await this.userRepository.save(entity);
   }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
     return await this.userRepository.findOne({
