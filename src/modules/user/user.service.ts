@@ -15,10 +15,14 @@ export class DBUserService implements IUserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async update(id: string, user: IUpdateUserMessage): Promise<User> {
-    return await this.userRepository.save({ id, ...user });
+    await this.userRepository.update(id, user as any);
+    return this.userRepository.findOne({ where: { id } });
   }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { username } });
+    return await this.userRepository.findOne({
+      where: { username },
+      relations: ['roles'],
+    });
   }
   updateExternalUser(external: string, user: User, groups: string[], raw: any) {
     throw new Error('Method not implemented.');
@@ -27,20 +31,33 @@ export class DBUserService implements IUserService {
     throw new Error('Method not implemented.');
   }
   async findOneByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: ['roles'],
+    });
   }
   async findOneByUsername(username: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { username } });
+    return await this.userRepository.findOne({
+      where: { username },
+      relations: ['roles'],
+    });
   }
   async getAllByIds(ids: string[]): Promise<User[]> {
-    return await this.userRepository.find({ where: { id: In(ids) } });
+    return await this.userRepository.find({
+      where: { id: In(ids) },
+      relations: ['roles'],
+    });
   }
   async getById(id: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { id } });
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: ['roles'],
+    });
   }
   async getUsersByRoleIds(roleId: string[]): Promise<User[]> {
     return await this.userRepository.find({
       where: { roles: { id: In(roleId) } },
+      relations: ['roles'],
     });
   }
   getByIdWithSelect(id: string, select: string): Promise<User> {
@@ -60,7 +77,7 @@ export class DBUserService implements IUserService {
     return await this.userRepository.save(createUserDto);
   }
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({ relations: ['roles'] });
   }
   async deleteIfDisabled(userId: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { id: userId } });

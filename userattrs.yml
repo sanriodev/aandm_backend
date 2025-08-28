@@ -2,7 +2,6 @@ generalWhitelist:
   - username
   - firstName
   - lastName
-  - nickname
   - email
   - id
 extendedWhitelist:
@@ -17,3 +16,6 @@ extendedWhitelist:
 jwtProperties:
   - id
   - username
+  - roles:
+      - id
+      - roleName
