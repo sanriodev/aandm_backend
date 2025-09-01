@@ -1,7 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Note } from '../entity/note.entity';
 
-export class UpdateNoteDto {
+export class UpdateNoteDto extends OmitType(Note, [
+  'lastModifiedUserId',
+  'userId',
+  'privacyMode',
+]) {
   @ApiProperty({
     description: 'id of the note',
     required: true,
@@ -9,14 +14,6 @@ export class UpdateNoteDto {
   })
   @IsNotEmpty()
   id: number;
-
-  @ApiProperty({
-    description: 'id of the user',
-    required: true,
-    type: String,
-  })
-  @IsOptional()
-  userId: string;
 
   @ApiProperty({
     description: 'Title of the note',

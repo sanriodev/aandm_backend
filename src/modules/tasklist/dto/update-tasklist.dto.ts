@@ -1,7 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+import { TaskList } from '../entity/tasklist.entity';
 
-export class UpdateTaskListDto {
+export class UpdateTaskListDto extends OmitType(TaskList, [
+  'lastModifiedUserId',
+  'userId',
+  'privacyMode',
+]) {
   @ApiProperty({
     example: '1',
     description: 'The id of the tasklist',
@@ -17,12 +22,4 @@ export class UpdateTaskListDto {
   })
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty({
-    example: 'privacy mode',
-    description: 'The privacy mode of the tasklist',
-    required: true,
-  })
-  @IsOptional()
-  privacyMode: number;
 }
