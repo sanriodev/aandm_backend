@@ -54,3 +54,31 @@ build_release_image:
   when: manual
   script:
     - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
+
+sast:
+  stage: test
+  tags:
+    - sast
+
+container_scanning_be_staging:
+  extends: container_scanning
+  stage: test
+  needs:
+    - build_image_be_dev
+  rules:
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    when: never
+  - if: '$CI_COMMIT_REF_NAME == "dev"'
+    when: always
+  tags:
+    - container-scan
+  before_script:
+    - export CS_IMAGE="git.blvckleg.dev:5050/personal/alinas-app/aandm_backend:staging"
+
+container_scanning:
+  rules:
+    - when: never
+
+include:
+- template: Security/SAST.gitlab-ci.yml
+- template: Jobs/Container-Scanning.gitlab-ci.yml
