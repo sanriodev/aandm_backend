@@ -1,4 +1,4 @@
-stages: [build, test, staging, release]
+stages: [build, test, staging, scanning, release]
 
 default:
   tags: [docker-build-01]
@@ -62,7 +62,7 @@ sast:
 
 container_scanning_staging:
   extends: container_scanning
-  stage: test
+  stage: scanning
   needs:
     - build_staging_image
   rules:
