@@ -4,7 +4,7 @@
   "description": "AandM Backend Server API",
   "author": "Matteo Juen",
   "private": true,
-  "license": "MIT",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
