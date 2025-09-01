@@ -90,7 +90,7 @@ export class TaskListController {
     description: 'returns a task-list',
   })
   async getTaskList(@Param('id') id: number): Promise<ReS<TaskList>> {
-    return ReS.FromData(await this.taskListService.findOne(id, []));
+    return ReS.FromData(await this.taskListService.findOne({ where: { id } }));
   }
 
   @Delete('/:id')

@@ -86,7 +86,7 @@ export class TaskController {
     description: 'returns a task',
   })
   async getTaskList(@Param('id') id: number): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskService.findOne(id, []));
+    return ReS.FromData(await this.taskService.findOne({ where: { id } }));
   }
 
   @Delete('/:id')

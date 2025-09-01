@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
-import { INote } from '../interface/note.interface';
 
-export class UpdateNoteDto implements INote {
+export class UpdateNoteDto {
   @ApiProperty({
     description: 'id of the note',
     required: true,
@@ -34,4 +33,12 @@ export class UpdateNoteDto implements INote {
   })
   @IsOptional()
   content: string;
+
+  @ApiProperty({
+    description: 'privacy mode of the note',
+    required: true,
+    type: String,
+  })
+  @IsOptional()
+  privacyMode: number;
 }
