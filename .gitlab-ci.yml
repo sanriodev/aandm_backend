@@ -60,11 +60,11 @@ sast:
   tags:
     - sast
 
-container_scanning_be_staging:
+container_scanning_staging:
   extends: container_scanning
   stage: test
   needs:
-    - build_image_be_dev
+    - build_staging_image
   rules:
   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     when: never
