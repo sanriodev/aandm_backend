@@ -7,7 +7,7 @@ import {
   Role,
   User,
 } from '@personal/user-auth';
-import { In, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 
 @Injectable()
 export class DBUserService implements IUserService {
@@ -16,10 +16,17 @@ export class DBUserService implements IUserService {
   ) {}
   async update(id: string, dto: IUpdateUserMessage): Promise<User> {
     const entity = await this.userRepository.findOne({ where: { id } });
-    delete dto.roles;
-    if (!entity) throw new UnprocessableEntityException('User not found');
-    dto.id = entity.id;
-    return await this.userRepository.save(dto, { reload: true });
+    // delete dto.roles;
+    // if (!entity) throw new UnprocessableEntityException('User not found');
+    // dto.id = entity.id;
+    // return await this.userRepository.save(dto, { reload: true });
+
+    for (const k in dto) {
+      if (dto.hasOwnProperty(k)) {
+        (entity as any)[k] = dto[k];
+      }
+    }
+    return await this.userRepository.save(entity as DeepPartial<User>);
   }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
     return await this.userRepository.findOne({
