@@ -71,7 +71,7 @@ container_scanning_staging:
   - if: '$CI_COMMIT_REF_NAME == "dev"'
     when: always
   tags:
-    - container-scan
+    - docker-build-01
   before_script:
     - export CS_IMAGE="git.blvckleg.dev:5050/personal/alinas-app/aandm_backend:staging"
 
