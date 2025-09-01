@@ -12,6 +12,7 @@ import {
   Delete,
   Put,
   Version,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,12 +25,16 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import {
   JWTAuthGuard,
+  JWTPayload,
   Permissions,
   PermissionsGuard,
   ReS,
+  UserFromRequest,
 } from '@personal/common';
 import { Note } from './entity/note.entity';
 import { NoteService } from './note.service';
+import { Privacy } from '../common/enum/privacy.enum';
+import { In } from 'typeorm';
 
 @Controller('note')
 @ApiTags('note')
@@ -53,9 +58,20 @@ export class NoteController {
     summary: 'create a note',
     description: 'creates a new note',
   })
-  async createOrUpdate(@Body() inputs: CreateNoteDto): Promise<ReS<Note>> {
+  async createOrUpdate(
+    @Body() inputs: CreateNoteDto,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Note>> {
     try {
-      return ReS.FromData(await this.noteService.create(inputs));
+      if (!user.user.id) {
+        throw new ForbiddenException('unauthenticated');
+      }
+      const dto = {
+        ...inputs,
+        userId: user.user.id,
+        lastModifiedUserId: user.user.id,
+      };
+      return ReS.FromData(await this.noteService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
     }
@@ -70,8 +86,18 @@ export class NoteController {
     summary: 'get all notes',
     description: 'returns all notes',
   })
-  async getNotes(): Promise<ReS<Note[]>> {
-    return ReS.FromData(await this.noteService.findMany({}));
+  async getNotes(@UserFromRequest() user: JWTPayload): Promise<ReS<Note[]>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    return ReS.FromData(
+      await this.noteService.findMany({
+        where: [
+          { userId: user.user.id },
+          { privacyMode: In([Privacy.Public, Privacy.Protected]) },
+        ],
+      }),
+    );
   }
 
   @Get('/:id')
@@ -85,7 +111,7 @@ export class NoteController {
     description: 'returns a note',
   })
   async getNote(@Param('id') id: number): Promise<ReS<Note>> {
-    return ReS.FromData(await this.noteService.findOne(id, []));
+    return ReS.FromData(await this.noteService.findOne({ where: { id } }));
   }
 
   @Put('/')

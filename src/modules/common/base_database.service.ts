@@ -13,11 +13,7 @@ export abstract class BaseDatabaseService<
 > {
   constructor(protected readonly repository: Repository<T>) {}
 
-  async findOne(id: number, relations: string[] = []) {
-    const options: FindOneOptions<T> = {
-      where: { id: id as any },
-    };
-    if (relations.length > 0) options.relations = relations;
+  async findOne(options: FindOneOptions<T>) {
     return await this.repository.findOne(options);
   }
 
@@ -51,11 +47,11 @@ export abstract class BaseDatabaseService<
 
   async update(data: UpdateT) {
     await this.repository.save(data);
-    return await this.findOne(data.id);
+    return await this.findOne({ where: { id: data.id } as any });
   }
 
   async delete(id: number) {
-    const current = await this.findOne(id);
+    const current = await this.findOne({ where: { id } as any });
     await this.repository.delete(current.id);
     return current;
   }

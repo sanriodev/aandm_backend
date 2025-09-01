@@ -1,3 +1,4 @@
+import { Privacy } from '../../common/enum/privacy.enum';
 import { Task } from '../../task/entity/task.entity';
 import { ITaskList } from '../interface/tasklist.interface';
 import {
@@ -18,6 +19,12 @@ export class TaskList implements ITaskList {
     nullable: false,
   })
   name: string;
+
+  @Column({ nullable: false, default: Privacy.Private })
+  privacyMode: Privacy;
+
+  @Column({ nullable: false })
+  lastModifiedUserId: string;
 
   @Column({
     nullable: false,
