@@ -58,7 +58,7 @@ build_release_image:
 sast:
   stage: test
   tags:
-    - sast
+    - docker-build-01
 
 container_scanning_staging:
   extends: container_scanning
