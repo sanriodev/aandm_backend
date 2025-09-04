@@ -46,7 +46,10 @@ build_staging_image:
   needs: [test_test_image]
   script:
     - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
-
+    # Additional push to GHCR
+    - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+    - docker tag "$CI_REGISTRY_IMAGE:staging" "ghcr.io/sanriodev/aandm_backend:staging"
+    - docker push "ghcr.io/sanriodev/aandm_backend:staging"
 build_release_image:
   stage: release
   extends: .before_docker
@@ -54,7 +57,10 @@ build_release_image:
   when: manual
   script:
     - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
-
+    # Additional push to GHCR
+    - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+    - docker tag "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
+    - docker push "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
 # sast:
 #   stage: test
 #   tags:
