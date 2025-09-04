@@ -110,8 +110,21 @@ export class NoteController {
     summary: 'get a note',
     description: 'returns a note',
   })
-  async getNote(@Param('id') id: number): Promise<ReS<Note>> {
-    return ReS.FromData(await this.noteService.findOne({ where: { id } }));
+  async getNote(
+    @Param('id') id: number,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Note>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    return ReS.FromData(
+      await this.noteService.findOne({
+        where: [
+          { id, userId: user.user.id },
+          { id, privacyMode: In([Privacy.Public, Privacy.Protected]) },
+        ],
+      }),
+    );
   }
 
   @Put('/')

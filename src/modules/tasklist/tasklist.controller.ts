@@ -11,6 +11,7 @@ import {
   Param,
   Delete,
   Version,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,12 +24,16 @@ import {
 import { CreateTaskListDto } from './dto/create-tasklist.dto';
 import {
   JWTAuthGuard,
+  JWTPayload,
   Permissions,
   PermissionsGuard,
   ReS,
+  UserFromRequest,
 } from '@personal/common';
 import { TaskList } from './entity/tasklist.entity';
 import { TaskListService } from './tasklist.service';
+import { In } from 'typeorm';
+import { Privacy } from '../common/enum/privacy.enum';
 
 @Controller('task-list')
 @ApiTags('task-list')
@@ -55,9 +60,18 @@ export class TaskListController {
   @ApiBody({ type: CreateTaskListDto })
   async createTaskList(
     @Body() inputs: CreateTaskListDto,
+    @UserFromRequest() user: JWTPayload,
   ): Promise<ReS<TaskList>> {
     try {
-      return ReS.FromData(await this.taskListService.create(inputs));
+      if (!user.user.id) {
+        throw new ForbiddenException('unauthenticated');
+      }
+      const dto = {
+        ...inputs,
+        userId: user.user.id,
+        lastModifiedUserId: user.user.id,
+      };
+      return ReS.FromData(await this.taskListService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
     }
@@ -73,9 +87,19 @@ export class TaskListController {
     summary: 'get all',
     description: 'get all task-lists',
   })
-  async getTaskLists(): Promise<ReS<TaskList[]>> {
+  async getTaskLists(
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<TaskList[]>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
     return ReS.FromData(
-      await this.taskListService.findMany({ relations: ['tasks'] }),
+      await this.taskListService.findMany({
+        where: [
+          { userId: user.user.id },
+          { privacyMode: In([Privacy.Public, Privacy.Protected]) },
+        ],
+      }),
     );
   }
 
@@ -89,8 +113,21 @@ export class TaskListController {
     summary: 'get a task-list',
     description: 'returns a task-list',
   })
-  async getTaskList(@Param('id') id: number): Promise<ReS<TaskList>> {
-    return ReS.FromData(await this.taskListService.findOne({ where: { id } }));
+  async getTaskList(
+    @Param('id') id: number,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<TaskList>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    return ReS.FromData(
+      await this.taskListService.findOne({
+        where: [
+          { id, userId: user.user.id },
+          { id, privacyMode: In([Privacy.Public, Privacy.Protected]) },
+        ],
+      }),
+    );
   }
 
   @Delete('/:id')
