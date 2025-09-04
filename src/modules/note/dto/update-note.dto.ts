@@ -20,7 +20,7 @@ export class UpdateNoteDto extends OmitType(Note, [
     required: true,
     type: String,
   })
-  @IsNotEmpty()
+  @IsOptional()
   title: string;
 
   @ApiProperty({

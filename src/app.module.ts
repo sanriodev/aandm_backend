@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RoleModule, UserAuthModule } from '@personal/user-auth';
-import { AppConfigModule } from '@personal/common';
+import { AppConfigModule, HealthModule } from '@personal/common';
 import { DatabaseProviderModule } from './provider/provider.module';
 import { ConfigModule } from '@nestjs/config';
 import { DBUserModule } from './modules/user/user.module';
@@ -32,7 +32,7 @@ const ENV = process.env.NODE_ENV;
       inject: [DBUserService],
       imports: [DBUserModule],
     }),
-    // HealthModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

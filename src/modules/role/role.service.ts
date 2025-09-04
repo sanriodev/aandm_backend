@@ -1,11 +1,11 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IRoleService } from '@personal/user-auth';
+import { IRoleService, UpdateRoleMessage } from '@personal/user-auth';
 import {
   CreateRoleDto,
   UpdateRoleDto,
 } from '@personal/user-auth/src/controller/v1/dto';
-import { In, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { Role } from './entity/role.entity';
 
 @Injectable()
@@ -58,10 +58,15 @@ export class DBRolesService implements IRoleService {
     return await this.rolesModel.create(inputs);
   }
 
-  async update(id: string, inputs: UpdateRoleDto): Promise<Role> {
-    const role = await this.rolesModel.findOne({ where: { id } });
-    if (!role) throw new UnprocessableEntityException('no such role');
-    return await this.rolesModel.save({ ...role, ...inputs });
+  async update(id: string, dto: UpdateRoleMessage): Promise<Role> {
+    const entity = await this.getById(id);
+    delete dto.id;
+    for (const k in dto) {
+      if (dto[k] !== undefined) {
+        (entity as any)[k] = dto[k];
+      }
+    }
+    return await this.rolesModel.save(entity);
   }
 
   async delete(id: string) {

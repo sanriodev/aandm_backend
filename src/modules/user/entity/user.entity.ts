@@ -4,26 +4,20 @@ import {
   ManyToMany,
   JoinTable,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
 import { Role } from '../../role/entity/role.entity';
 import { User as IUser } from '@personal/user-auth';
+import { TaskList } from '../../tasklist/entity/tasklist.entity';
+import { Note } from '../../note/entity/note.entity';
 
 @Entity()
 export class User extends IUser {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ nullable: false, unique: false })
-  firstName: string;
-
-  @Column({ nullable: false, unique: false })
-  lastName: string;
-
   @Column({ nullable: false, unique: true })
   username: string;
-
-  @Column({ nullable: false, default: 'active' })
-  status: string;
 
   @Column({
     nullable: true,
@@ -66,4 +60,20 @@ export class User extends IUser {
     },
   })
   roles: Role[];
+
+  // 1:M to Note (owner)
+  @OneToMany(() => Note, (note) => note.user)
+  notes: Note[];
+
+  // 1:M to Note (as last modified by)
+  @OneToMany(() => Note, (note) => note.lastModifiedUser)
+  lastModifiedNotes: Note[];
+
+  // 1:M to TaskList (owner)
+  @OneToMany(() => TaskList, (tl) => tl.user)
+  taskLists: TaskList[];
+
+  // 1:M to TaskList (as last modified by)
+  @OneToMany(() => TaskList, (tl) => tl.lastModifiedUser)
+  lastModifiedTaskLists: TaskList[];
 }
