@@ -3,9 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
 import { INote } from '../interface/note.interface';
 import { Privacy } from '../../common/enum/privacy.enum';

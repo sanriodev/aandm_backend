@@ -1,5 +1,4 @@
 import { Privacy } from '../../common/enum/privacy.enum';
-import { Note } from '../../note/entity/note.entity';
 import { Task } from '../../task/entity/task.entity';
 import { User } from '../../user/entity/user.entity';
 import { ITaskList } from '../interface/tasklist.interface';
@@ -10,9 +9,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
-  RelationId,
   UpdateDateColumn,
 } from 'typeorm';
 
