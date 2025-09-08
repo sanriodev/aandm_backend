@@ -1,0 +1,21 @@
+generalWhitelist:
+  - username
+  - firstName
+  - lastName
+  - email
+  - id
+extendedWhitelist:
+  - appTokens
+  - refreshTokens
+  - roles:
+      - id
+      - roleName
+      - accessPermissions
+      - navPermissions
+      - appPermissions
+jwtProperties:
+  - id
+  - username
+  - roles:
+      - id
+      - roleName

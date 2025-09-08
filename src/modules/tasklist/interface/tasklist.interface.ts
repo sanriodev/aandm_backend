@@ -1,7 +1,10 @@
-import { ITask } from './task.interface';
+import { ITask } from '../../task/interface/task.interface';
 
 export interface ITaskList {
-  _id: string;
+  id: number;
   name: string;
   tasks?: ITask[];
+  privacyMode: number;
+  lastModifiedUserId: string;
+  userId: string;
 }

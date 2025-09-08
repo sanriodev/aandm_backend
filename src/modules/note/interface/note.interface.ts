@@ -1,6 +1,8 @@
 export interface INote {
-  _id: string;
+  id: number;
   title: string;
-  user: string;
+  privacyMode: number;
+  userId: string;
+  lastModifiedUserId: string;
   content?: string;
 }

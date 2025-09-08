@@ -1,11 +1,20 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { NoteDto } from './note.dto';
-import { IsOptional } from 'class-validator';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Note } from '../entity/note.entity';
 
-export class UpdateNoteDto extends PickType(NoteDto, [
-  '_id',
-  'content',
-] as const) {
+export class UpdateNoteDto extends OmitType(Note, [
+  'lastModifiedUserId',
+  'userId',
+  'privacyMode',
+]) {
+  @ApiProperty({
+    description: 'id of the note',
+    required: true,
+    type: String,
+  })
+  @IsNotEmpty()
+  id: number;
+
   @ApiProperty({
     description: 'Title of the note',
     required: true,
@@ -13,11 +22,20 @@ export class UpdateNoteDto extends PickType(NoteDto, [
   })
   @IsOptional()
   title: string;
+
   @ApiProperty({
-    description: 'User who created the note',
+    description: 'content of the note',
     required: true,
     type: String,
   })
   @IsOptional()
-  user: string;
+  content: string;
+
+  @ApiProperty({
+    description: 'privacy mode of the note',
+    required: true,
+    type: String,
+  })
+  @IsOptional()
+  privacyMode: number;
 }
