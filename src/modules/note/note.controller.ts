@@ -137,7 +137,17 @@ export class NoteController {
     summary: 'update a note',
     description: 'updates a note',
   })
-  async updateNote(@Body() dto: UpdateNoteDto): Promise<ReS<Note>> {
+  async updateNote(
+    @Body() inputs: UpdateNoteDto,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Note>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    const dto = {
+      ...inputs,
+      lastModifiedUserId: user.user.id,
+    };
     return ReS.FromData(await this.noteService.update(dto));
   }
 
@@ -151,7 +161,19 @@ export class NoteController {
     summary: 'delete a note',
     description: 'deletes a note',
   })
-  async deleteNote(@Param('id') id: number): Promise<ReS<Note>> {
+  async deleteNote(
+    @Param('id') id: number,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Note>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    const entity = await this.noteService.findOne({ where: { id } });
+    if (!entity || entity.userId !== user.user.id) {
+      throw new ForbiddenException(
+        'Model not found or does not belong to user',
+      );
+    }
     return ReS.FromData(await this.noteService.delete(id));
   }
 }
