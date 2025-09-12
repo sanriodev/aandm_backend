@@ -140,7 +140,19 @@ export class TaskListController {
     summary: 'delete a task-list',
     description: 'deletes a task-list',
   })
-  async deleteTaskList(@Param('id') id: number): Promise<ReS<TaskList>> {
+  async deleteTaskList(
+    @Param('id') id: number,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<TaskList>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    const entity = await this.taskListService.findOne({ where: { id } });
+    if (!entity || entity.userId !== user.user.id) {
+      throw new ForbiddenException(
+        'Model not found or does not belong to user',
+      );
+    }
     return ReS.FromData(await this.taskListService.delete(id));
   }
 }
