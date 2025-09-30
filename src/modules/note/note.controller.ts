@@ -58,7 +58,7 @@ export class NoteController {
     summary: 'create a note',
     description: 'creates a new note',
   })
-  async createOrUpdate(
+  async create(
     @Body() inputs: CreateNoteDto,
     @UserFromRequest() user: JWTPayload,
   ): Promise<ReS<Note>> {

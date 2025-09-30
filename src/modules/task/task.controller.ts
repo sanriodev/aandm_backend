@@ -11,6 +11,7 @@ import {
   Param,
   Delete,
   Version,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -28,6 +29,7 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('task')
 @ApiTags('task')
@@ -87,6 +89,20 @@ export class TaskController {
   })
   async getTaskList(@Param('id') id: number): Promise<ReS<Task>> {
     return ReS.FromData(await this.taskService.findOne({ where: { id } }));
+  }
+
+  @Put('/')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:update')
+  @ApiOperation({
+    summary: 'update a task',
+    description: 'updates a task',
+  })
+  async updateTask(@Body() inputs: UpdateTaskDto): Promise<ReS<Task>> {
+    return ReS.FromData(await this.taskService.update(inputs));
   }
 
   @Delete('/:id')
