@@ -11,6 +11,7 @@ import {
   Param,
   Delete,
   Version,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -28,6 +29,7 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Controller('task')
 @ApiTags('task')
@@ -69,9 +71,32 @@ export class TaskController {
     summary: 'get all tasks',
     description: 'returns all tasks',
   })
-  async getTaskLists(): Promise<ReS<Task[]>> {
+  async getTasks(): Promise<ReS<Task[]>> {
     return ReS.FromData(
-      await this.taskService.findMany({ relations: ['tasks'] }),
+      await this.taskService.findMany({
+        relations: ['taskList'],
+        order: { id: 'DESC' },
+      }),
+    );
+  }
+
+  @Get('/list/:id')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:get:all')
+  @ApiOperation({
+    summary: 'get all tasks',
+    description: 'returns all tasks',
+  })
+  async getTasksForList(@Param('id') id: number): Promise<ReS<Task[]>> {
+    return ReS.FromData(
+      await this.taskService.findMany({
+        where: { taskList: { id: id } },
+        relations: ['taskList'],
+        order: { id: 'DESC' },
+      }),
     );
   }
 
@@ -86,7 +111,26 @@ export class TaskController {
     description: 'returns a task',
   })
   async getTaskList(@Param('id') id: number): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskService.findOne({ where: { id } }));
+    return ReS.FromData(
+      await this.taskService.findOne({
+        where: { id },
+        relations: ['taskList'],
+      }),
+    );
+  }
+
+  @Put('/')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task:update')
+  @ApiOperation({
+    summary: 'update a task',
+    description: 'updates a task',
+  })
+  async updateTask(@Body() inputs: UpdateTaskDto): Promise<ReS<Task>> {
+    return ReS.FromData(await this.taskService.update(inputs));
   }
 
   @Delete('/:id')

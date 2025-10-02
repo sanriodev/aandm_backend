@@ -36,6 +36,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
+    "standard-version": "^9.5.0",
     "typeorm": "^0.3.25"
   },
   "devDependencies": {

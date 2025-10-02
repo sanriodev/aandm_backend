@@ -8,6 +8,7 @@ export class UpdateTaskDto implements ITask {
     description: 'The id of the task',
     required: true,
   })
+  @IsNotEmpty()
   id: number;
 
   @ApiProperty({
@@ -15,7 +16,7 @@ export class UpdateTaskDto implements ITask {
     required: true,
     type: String,
   })
-  @IsNotEmpty()
+  @IsOptional()
   title: string;
 
   @ApiProperty({

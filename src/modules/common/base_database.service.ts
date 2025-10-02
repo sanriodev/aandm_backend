@@ -46,6 +46,15 @@ export abstract class BaseDatabaseService<
   }
 
   async update(data: UpdateT) {
+    const existing = await this.repository.findOne({
+      where: { id: data.id } as any,
+    });
+    if (!existing) {
+      throw new Error('Entity not found');
+    }
+    if (data['userId']) {
+      data['userId'] = existing['userId'];
+    }
     await this.repository.save(data);
     return await this.findOne({ where: { id: data.id } as any });
   }

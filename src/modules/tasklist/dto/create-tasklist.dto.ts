@@ -9,12 +9,4 @@ export class CreateTaskListDto {
   })
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty({
-    example: 'id of the user',
-    description: 'The id of the user',
-    required: true,
-  })
-  @IsNotEmpty()
-  userId: string;
 }
