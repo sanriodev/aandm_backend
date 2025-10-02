@@ -99,6 +99,7 @@ export class TaskListController {
           { userId: user.user.id },
           { privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        order: { id: 'DESC' },
       }),
     );
   }

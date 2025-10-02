@@ -96,6 +96,7 @@ export class NoteController {
           { userId: user.user.id },
           { privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        order: { id: 'DESC' },
       }),
     );
   }

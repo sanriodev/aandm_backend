@@ -73,7 +73,10 @@ export class TaskController {
   })
   async getTasks(): Promise<ReS<Task[]>> {
     return ReS.FromData(
-      await this.taskService.findMany({ relations: ['taskList'] }),
+      await this.taskService.findMany({
+        relations: ['taskList'],
+        order: { id: 'DESC' },
+      }),
     );
   }
 
@@ -92,6 +95,7 @@ export class TaskController {
       await this.taskService.findMany({
         where: { taskList: { id: id } },
         relations: ['taskList'],
+        order: { id: 'DESC' },
       }),
     );
   }
