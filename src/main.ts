@@ -47,7 +47,10 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new RequestScopeInterceptor());
   const ENV = process.env.NODE_ENV;
-  if (ENV != 'production' && ENV != 'prod') {
+  const swaggerEnabled = process.env.SWAGGER_ENABLED;
+  if (swaggerEnabled == 'true' || swaggerEnabled == '1') {
+    bootstrapSwagger(app, microserviceService);
+  } else if (ENV != 'production' && ENV != 'prod') {
     bootstrapSwagger(app, microserviceService);
   }
   const port = appConfig.port || 3000;
