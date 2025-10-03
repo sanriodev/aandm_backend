@@ -15,6 +15,7 @@ RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/20/packages/npm/:_auth
 RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/19/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
 ####
 COPY ./package*.json /home/node/
+COPY ./userattrs.yml /home/node/
 
 RUN npm ci 
 
@@ -33,6 +34,7 @@ WORKDIR /home/node
 COPY --chown=node:node --from=builder /home/node/package*.json /home/node/
 COPY --chown=node:node --from=builder /home/node/node_modules/ /home/node/node_modules/
 COPY --chown=node:node --from=builder /home/node/dist/ /home/node/dist/
+COPY --chown=node:node --from=builder /home/node/userattrs.yml /home/node/userattrs.yml
 COPY --chown=node:node --from=builder /home/node/src/migrations /home/node/src/migrations
 COPY --chown=node:node --from=builder /home/node/src/config/database /home/node/src/config/database
 COPY --chown=node:node --from=builder /home/node/entrypoint.sh /home/node/entrypoint.sh
