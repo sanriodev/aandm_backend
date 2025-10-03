@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://git.blvckleg.dev/personal/aandm_backend/compare/v1.0.0...v1.0.1) (2025-10-03)
+
+
+### Bug Fixes
+
+* add user attrs ([b7ee937](https://git.blvckleg.dev/personal/aandm_backend/commit/b7ee937c85c4043daeecadee70b9884b1ccb7397))
+
 ## 1.0.0 (2025-10-02)
 
 
