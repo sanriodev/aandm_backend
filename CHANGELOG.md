@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://git.blvckleg.dev/personal/aandm_backend/compare/1.0.1...1.0.2) (2025-10-03)
+
+
+### Bug Fixes
+
+* **user roles:** this is dangerous findOne on undefined id reutrns first role which is root ([723b745](https://git.blvckleg.dev/personal/aandm_backend/commit/723b745ff5f72a79d4412fa12cef09cdcaba91cd))
+
 ### [1.0.1](https://git.blvckleg.dev/personal/aandm_backend/compare/v1.0.0...v1.0.1) (2025-10-03)
 
 
