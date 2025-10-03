@@ -68,9 +68,12 @@ export class DBUserService implements IUserService {
   }
   async getUserRoles(user: User): Promise<Role[]> {
     const u = await this.userRepository.findOne({
-      where: { id: user.id },
+      where: { username: user.username },
       relations: ['roles'],
     });
+    if (u?.username !== user.username) {
+      throw new Error('User not found');
+    }
     return u?.roles ?? [];
   }
   async create(createUserDto: ICreateUserMessage): Promise<User> {
