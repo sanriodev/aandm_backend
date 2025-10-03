@@ -15,6 +15,7 @@ RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/20/packages/npm/:_auth
 RUN npm config set -- '//git.blvckleg.dev/api/v4/projects/19/packages/npm/:_authToken' '${NPM_ACCESS_TOKEN}'
 ####
 COPY ./package*.json /home/node/
+COPY ./userattrs.yaml /home/node/
 
 RUN npm ci 
 
