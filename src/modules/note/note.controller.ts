@@ -71,6 +71,8 @@ export class NoteController {
         userId: user.user.id,
         lastModifiedUserId: user.user.id,
       };
+      dto['privacyMode'] = Privacy.Public;
+
       return ReS.FromData(await this.noteService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
@@ -149,6 +151,8 @@ export class NoteController {
       ...inputs,
       lastModifiedUserId: user.user.id,
     };
+    dto['privacyMode'] = Privacy.Public;
+
     return ReS.FromData(await this.noteService.update(dto));
   }
 
