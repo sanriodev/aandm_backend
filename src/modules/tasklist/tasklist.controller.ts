@@ -71,6 +71,7 @@ export class TaskListController {
         userId: user.user.id,
         lastModifiedUserId: user.user.id,
       };
+      dto['privacyMode'] = Privacy.Public;
       return ReS.FromData(await this.taskListService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
