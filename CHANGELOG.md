@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.0.2...1.1.0) (2025-10-04)
+
+
+### Features
+
+* for now just set default to private ([f9df5ed](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/f9df5edd1a64ca95e79a19433f78baf858a97172))
+
 ### [1.0.2](https://git.blvckleg.dev/personal/aandm_backend/compare/1.0.1...1.0.2) (2025-10-03)
 
 
