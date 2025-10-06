@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://git.blvckleg.dev/personal/aandm_backend/compare/1.1.0...1.1.1) (2025-10-06)
+
+
+### Bug Fixes
+
+* **refresh:** user service functions for refresh ([29667bf](https://git.blvckleg.dev/personal/aandm_backend/commit/29667bf649a79315824b51093213ba17d6b658d1))
+
 ## [1.1.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.0.2...1.1.0) (2025-10-04)
 
 
