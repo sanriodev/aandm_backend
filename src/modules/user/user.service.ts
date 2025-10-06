@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   ICreateUserMessage,
@@ -15,8 +15,22 @@ export class DBUserService implements IUserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
   async update(id: string, dto: IUpdateUserMessage): Promise<User> {
-    delete dto.id;
-    return await this.userRepository.save({ id, ...dto } as DeepPartial<User>);
+    if (!id && !dto.id) {
+      if (dto.username) {
+        dto.id = (await this.findOneByUsername(dto.username))?.id;
+      } else {
+        throw new UnprocessableEntityException('ID must be provided');
+      }
+    }
+    if (id) {
+      delete dto.id;
+      return await this.userRepository.save({
+        id,
+        ...dto,
+      } as DeepPartial<User>);
+    } else {
+      return await this.userRepository.save(dto as DeepPartial<User>);
+    }
   }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
     return await this.userRepository.findOne({
@@ -60,11 +74,13 @@ export class DBUserService implements IUserService {
       relations: ['roles'],
     });
   }
-  getByIdWithSelect(id: string, select: string): Promise<User> {
-    return this.userRepository.findOne({
+  async getByIdWithSelect(id: string, select: string): Promise<User> {
+    if (!id) throw new UnprocessableEntityException('ID must be provided');
+    const user = await this.userRepository.findOne({
       where: { id },
-      select: select.split(',').map((field) => field.trim() as keyof User),
+      relations: ['roles'],
     });
+    return user;
   }
   async getUserRoles(user: User): Promise<Role[]> {
     const u = await this.userRepository.findOne({
