@@ -98,6 +98,7 @@ export class NoteController {
           { userId: user.user.id },
           { privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        relations: ['user', 'lastModifiedUser'],
         order: { id: 'DESC' },
       }),
     );
@@ -126,6 +127,7 @@ export class NoteController {
           { id, userId: user.user.id },
           { id, privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        relations: ['user', 'lastModifiedUser'],
       }),
     );
   }

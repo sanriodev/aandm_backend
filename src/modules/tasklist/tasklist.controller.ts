@@ -100,7 +100,7 @@ export class TaskListController {
           { userId: user.user.id },
           { privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
-        relations: ['tasks'],
+        relations: ['tasks', 'user', 'lastModifiedUser'],
         order: { id: 'DESC' },
       }),
     );
@@ -129,6 +129,7 @@ export class TaskListController {
           { id, userId: user.user.id },
           { id, privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        relations: ['tasks', 'user', 'lastModifiedUser'],
       }),
     );
   }
