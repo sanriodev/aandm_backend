@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.2...1.1.3) (2025-10-08)
+
+
+### Bug Fixes
+
+* add user relations ([22f1307](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/22f1307373e2f246deca8d59fb07fdf3e3fc7290))
+* update task list last modified user when a child task gets created, updated or deleted ([d8bb2a0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/d8bb2a05264be2a9d857b47405d371f3d299eaa6))
+
 ### [1.1.2](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.1...1.1.2) (2025-10-08)
 
 
