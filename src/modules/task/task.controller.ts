@@ -12,6 +12,7 @@ import {
   Delete,
   Version,
   Put,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,14 +23,17 @@ import {
 } from '@nestjs/swagger';
 import {
   JWTAuthGuard,
+  JWTPayload,
   Permissions,
   PermissionsGuard,
   ReS,
+  UserFromRequest,
 } from '@personal/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entity/task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskListService } from '../tasklist/tasklist.service';
 
 @Controller('task')
 @ApiTags('task')
@@ -41,6 +45,8 @@ export class TaskController {
   constructor(
     @Inject(TaskService)
     private readonly taskService: TaskService,
+    @Inject(TaskListService)
+    private readonly taskListService: TaskListService,
   ) {}
 
   @Post('/')
@@ -53,9 +59,21 @@ export class TaskController {
     summary: 'create a task',
     description: 'creates a new task',
   })
-  async createTask(@Body() inputs: CreateTaskDto): Promise<ReS<Task>> {
+  async createTask(
+    @Body() inputs: CreateTaskDto,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Task>> {
     try {
-      return ReS.FromData(await this.taskService.create(inputs));
+      if (!user.user.id) {
+        throw new ForbiddenException('unauthenticated');
+      }
+      const res = ReS.FromData(await this.taskService.create(inputs));
+      const taskList = await this.taskListService.findOne({
+        where: { id: inputs.taskListId },
+      });
+      taskList.lastModifiedUserId = user.user.id;
+      await this.taskListService.update(taskList);
+      return res;
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
     }
@@ -129,8 +147,28 @@ export class TaskController {
     summary: 'update a task',
     description: 'updates a task',
   })
-  async updateTask(@Body() inputs: UpdateTaskDto): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskService.update(inputs));
+  async updateTask(
+    @Body() inputs: UpdateTaskDto,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Task>> {
+    try {
+      if (!user.user.id) {
+        throw new ForbiddenException('unauthenticated');
+      }
+      const updated = await this.taskService.update(inputs);
+      const res = ReS.FromData(updated);
+      if (!updated.taskListId) {
+        throw new UnprocessableEntityException('TaskListId missing');
+      }
+      const taskList = await this.taskListService.findOne({
+        where: { id: updated.taskListId },
+      });
+      taskList.lastModifiedUserId = user.user.id;
+      await this.taskListService.update(taskList);
+      return res;
+    } catch (error) {
+      throw new UnprocessableEntityException(error.message);
+    }
   }
 
   @Delete('/:id')
@@ -143,7 +181,27 @@ export class TaskController {
     summary: 'delete a task',
     description: 'deletes a task',
   })
-  async deleteTaskList(@Param('id') id: number): Promise<ReS<Task>> {
-    return ReS.FromData(await this.taskService.delete(id));
+  async deleteTaskList(
+    @Param('id') id: number,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<Task>> {
+    try {
+      if (!user.user.id) {
+        throw new ForbiddenException('unauthenticated');
+      }
+      const deleted = await this.taskService.delete(id);
+      const res = ReS.FromData(deleted);
+      if (!deleted.taskListId) {
+        throw new UnprocessableEntityException('TaskListId missing');
+      }
+      const taskList = await this.taskListService.findOne({
+        where: { id: deleted.taskListId },
+      });
+      taskList.lastModifiedUserId = user.user.id;
+      await this.taskListService.update(taskList);
+      return res;
+    } catch (error) {
+      throw new UnprocessableEntityException(error.message);
+    }
   }
 }
