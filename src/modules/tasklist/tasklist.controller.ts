@@ -100,6 +100,7 @@ export class TaskListController {
           { userId: user.user.id },
           { privacyMode: In([Privacy.Public, Privacy.Protected]) },
         ],
+        relations: ['tasks'],
         order: { id: 'DESC' },
       }),
     );
