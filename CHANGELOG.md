@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.3...1.1.4) (2025-10-16)
+
+
+### Bug Fixes
+
+* add content to dto ([4a6bad9](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/4a6bad9d083b6dce7b39d6cf577733343279b692))
+* remove hello world endpoint ([04d76a1](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/04d76a1802647d8f1efb3cba55388532377e0497))
+
 ### [1.1.3](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.2...1.1.3) (2025-10-08)
 
 
