@@ -19,6 +19,14 @@ export class CreateTaskDto {
   title: string;
 
   @ApiProperty({
+    example: 'some task description',
+    description: 'The content of the task',
+    required: true,
+  })
+  @IsOptional()
+  content: string;
+
+  @ApiProperty({
     example: false,
     description: 'If the task is done',
     required: true,
