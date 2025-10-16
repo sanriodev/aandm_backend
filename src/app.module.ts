@@ -34,7 +34,7 @@ const ENV = process.env.NODE_ENV;
     }),
     HealthModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}
