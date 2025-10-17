@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.4...1.2.0) (2025-10-17)
+
+
+### Features
+
+* add user join to check for privacy or author ([b58edb9](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/b58edb9b8c414bcf7ae518d3280b02d507e29f2e))
+* wip update task list endpoint ([3c0f462](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/3c0f4623454b1b3321623e266f2a14406519b41f))
+
+
+### Bug Fixes
+
+* remove default to public since it is now implemented ([5ad9c2b](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/5ad9c2b6edde4cda5d290f202c185394e35d22ce))
+
 ### [1.1.4](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.3...1.1.4) (2025-10-16)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "aandm_server_nest",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "AandM Backend Server API",
   "author": "Matteo Juen",
   "private": true,
