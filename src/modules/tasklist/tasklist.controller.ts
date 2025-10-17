@@ -73,7 +73,6 @@ export class TaskListController {
         userId: user.user.id,
         lastModifiedUserId: user.user.id,
       };
-      dto['privacyMode'] = Privacy.Public;
       return ReS.FromData(await this.taskListService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
@@ -157,7 +156,18 @@ export class TaskListController {
       ...inputs,
       lastModifiedUserId: user.user.id,
     };
-    //dto['privacyMode'] = Privacy.Public;
+
+    const existing = await this.taskListService.findOne({
+      where: { id: dto.id },
+    });
+    if (
+      existing?.privacyMode != dto.privacyMode &&
+      existing?.userId != user.user.id
+    ) {
+      throw new ForbiddenException(
+        'Cannot change privacy mode of a task-list you do not own',
+      );
+    }
 
     return ReS.FromData(await this.taskListService.update(dto));
   }
