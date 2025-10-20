@@ -6,3 +6,5 @@
 > [!NOTE]
 > All Images get pushed publicly to `ghcr.io` for Open Source Usage. here [Public packages](https://github.com/sanriodev/aandm_backend/pkgs/container/aandm_backend)
 
+This is build for Usage with a postgreSQL Datbase. However it will work with any other Database supported by TypeORM (MySQL, OracleDB, MariabDB...) when the corresponding npm package gets installed and the environment Varbiale for the Database Dialect gets set.
+
