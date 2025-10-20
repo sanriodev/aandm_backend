@@ -71,7 +71,6 @@ export class NoteController {
         userId: user.user.id,
         lastModifiedUserId: user.user.id,
       };
-      dto['privacyMode'] = Privacy.Public;
 
       return ReS.FromData(await this.noteService.create(dto));
     } catch (error) {
@@ -153,7 +152,20 @@ export class NoteController {
       ...inputs,
       lastModifiedUserId: user.user.id,
     };
-    dto['privacyMode'] = Privacy.Public;
+    if (dto.content == null) {
+      delete dto.content;
+    }
+    const existing = await this.noteService.findOne({
+      where: { id: dto.id },
+    });
+    if (
+      existing?.privacyMode != dto.privacyMode &&
+      existing?.userId != user.user.id
+    ) {
+      throw new ForbiddenException(
+        'Cannot change privacy mode of a note you do not own',
+      );
+    }
 
     return ReS.FromData(await this.noteService.update(dto));
   }

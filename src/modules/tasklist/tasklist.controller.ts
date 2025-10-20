@@ -12,6 +12,7 @@ import {
   Delete,
   Version,
   ForbiddenException,
+  Put,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -34,6 +35,7 @@ import { TaskList } from './entity/tasklist.entity';
 import { TaskListService } from './tasklist.service';
 import { In } from 'typeorm';
 import { Privacy } from '../common/enum/privacy.enum';
+import { UpdateTaskListDto } from './dto/update-tasklist.dto';
 
 @Controller('task-list')
 @ApiTags('task-list')
@@ -71,7 +73,6 @@ export class TaskListController {
         userId: user.user.id,
         lastModifiedUserId: user.user.id,
       };
-      dto['privacyMode'] = Privacy.Public;
       return ReS.FromData(await this.taskListService.create(dto));
     } catch (error) {
       throw new UnprocessableEntityException(error.message);
@@ -132,6 +133,43 @@ export class TaskListController {
         relations: ['tasks', 'user', 'lastModifiedUser'],
       }),
     );
+  }
+
+  @Put('/')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('task-list:update')
+  @ApiOperation({
+    summary: 'update a task-list',
+    description: 'updates a task-list',
+  })
+  async updateTaskList(
+    @Body() inputs: UpdateTaskListDto,
+    @UserFromRequest() user: JWTPayload,
+  ): Promise<ReS<TaskList>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    const dto = {
+      ...inputs,
+      lastModifiedUserId: user.user.id,
+    };
+
+    const existing = await this.taskListService.findOne({
+      where: { id: dto.id },
+    });
+    if (
+      existing?.privacyMode != dto.privacyMode &&
+      existing?.userId != user.user.id
+    ) {
+      throw new ForbiddenException(
+        'Cannot change privacy mode of a task-list you do not own',
+      );
+    }
+
+    return ReS.FromData(await this.taskListService.update(dto));
   }
 
   @Delete('/:id')
