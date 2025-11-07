@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RoleModule, UserAuthModule } from '@personal/user-auth';
 import { AppConfigModule, HealthModule } from '@personal/common';
@@ -32,6 +31,7 @@ const ENV = process.env.NODE_ENV;
       inject: [DBUserService],
       imports: [DBUserModule],
     }),
+
     HealthModule,
   ],
   controllers: [],
