@@ -136,7 +136,7 @@ export class SharedEntitySubscriber implements EntitySubscriberInterface {
       actionStatus: EventActionStatus.SUCCESS,
       actionType: EventActionType.DELETE,
       entityType: event.metadata.tableName,
-      entityId: event.entityId,
+      entityId: 'redacted',
       date: new Date(),
       data: {},
       auth: this.lookupAuthForRequestIfAny(),

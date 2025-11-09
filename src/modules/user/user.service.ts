@@ -56,6 +56,12 @@ export class DBUserService implements IUserService {
       relations: ['roles'],
     });
   }
+
+  async findAllByActivityPrivacy(publicActivity: boolean): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { publicActivity },
+    });
+  }
   async getAllByIds(ids: string[]): Promise<User[]> {
     return await this.userRepository.find({
       where: { id: In(ids) },
