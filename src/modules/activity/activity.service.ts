@@ -3,9 +3,7 @@ import {
   EventLogFilter,
   EventLoggerService,
   EventLogMessage,
-  UserService,
 } from '@personal/common';
-import { ActivityFilterDto } from './dto/activity-filter.dto';
 import { Task } from '../task/entity/task.entity';
 import { TaskList } from '../tasklist/entity/tasklist.entity';
 import { Note } from '../note/entity/note.entity';
@@ -19,31 +17,25 @@ export class ActivityService {
   ) {}
 
   async getActivity(
-    filterParams: ActivityFilterDto,
+    filterMode: 'own' | 'any',
     userId?: string,
   ): Promise<EventLogMessage<Task | TaskList | Note>[]> {
     let filter: EventLogFilter<any>;
-    if (filterParams.mode == 'own') {
+    if (filterMode == 'own') {
       filter = {
         raw: {
-          user: {
-            id: userId?.toString(),
-          },
-          take: filterParams.limit,
+          entityType: { $in: ['task', 'task_list', 'note'] },
+          'user.id': +userId,
         },
       };
-    } else if (filterParams.mode == 'any') {
+    } else if (filterMode == 'any') {
       const users = await this.userService.findAllByActivityPrivacy(true);
-      const userIds = users
-        .map((u) => u.id?.toString())
-        .filter((id): id is string => !!id);
+      const userIds = users.map((u) => u.id);
 
       filter = {
         raw: {
-          user: {
-            id: { $in: userIds },
-          },
-          take: filterParams.limit,
+          entityType: { $in: ['task', 'task_list', 'note'] },
+          'user.id': { $in: userIds },
         },
       };
     }

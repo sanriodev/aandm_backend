@@ -13,6 +13,7 @@ import {
   ApiBearerAuth,
   ApiExtraModels,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -28,7 +29,6 @@ import {
 import { Note } from '../note/entity/note.entity';
 import { TaskList } from '../tasklist/entity/tasklist.entity';
 import { Task } from '../task/entity/task.entity';
-import { ActivityFilterDto } from './dto/activity-filter.dto';
 import { ActivityService } from './activity.service';
 
 @Controller('activity')
@@ -53,18 +53,20 @@ export class ActivityController {
     summary: 'get all activity',
     description: 'returns all activity based on filter',
   })
+  @ApiQuery({
+    name: 'filterMode',
+    required: false,
+    description: "'own' to get own activity, 'any' to get all public activity",
+  })
   async getActivity(
     @UserFromRequest() user: JWTPayload,
-    @Query() getActivityFilterDto: ActivityFilterDto,
+    @Query('filterMode') filterMode: 'own' | 'any' = 'own',
   ): Promise<ReS<EventLogMessage<Task | TaskList | Note>[]>> {
     if (!user.user.id) {
       throw new ForbiddenException('unauthenticated');
     }
     return ReS.FromData(
-      await this.activityService.getActivity(
-        getActivityFilterDto,
-        user.user.id,
-      ),
+      await this.activityService.getActivity(filterMode, user.user.id),
     );
   }
 }
