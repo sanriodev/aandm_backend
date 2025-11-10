@@ -8,6 +8,7 @@ import {
   Version,
   ForbiddenException,
   Query,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -30,6 +31,8 @@ import { Note } from '../note/entity/note.entity';
 import { TaskList } from '../tasklist/entity/tasklist.entity';
 import { Task } from '../task/entity/task.entity';
 import { ActivityService } from './activity.service';
+import { User } from '../user/entity/user.entity';
+import { DBUserService } from '../user/user.service';
 
 @Controller('activity')
 @ApiTags('activity')
@@ -41,6 +44,8 @@ export class ActivityController {
   constructor(
     @Inject(ActivityService)
     private readonly activityService: ActivityService,
+    @Inject(DBUserService)
+    private readonly userService: DBUserService,
   ) {}
 
   @Get('/')
@@ -67,6 +72,31 @@ export class ActivityController {
     }
     return ReS.FromData(
       await this.activityService.getActivity(filterMode, user.user.id),
+    );
+  }
+
+  @Patch('/public-activity')
+  @Version('1')
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  @UseGuards(JWTAuthGuard)
+  @ApiBearerAuth()
+  @Permissions('user:update:own')
+  @ApiOperation({
+    summary: 'update own user',
+    description: 'update own user activity privacy settings',
+  })
+  async changePublicActivityMode(
+    @UserFromRequest() user: JWTPayload,
+    @Query('publicActivity') publicActivity: boolean = false,
+  ): Promise<ReS<User>> {
+    if (!user.user.id) {
+      throw new ForbiddenException('unauthenticated');
+    }
+    return ReS.FromData(
+      await this.userService.updateActivitySetting(
+        publicActivity,
+        user.user.id,
+      ),
     );
   }
 }
