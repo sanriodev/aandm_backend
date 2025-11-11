@@ -32,6 +32,12 @@ export class User extends IUser {
   salt: string;
 
   @Column({
+    default: false,
+    nullable: false,
+  })
+  publicActivity: boolean;
+
+  @Column({
     type: 'text',
     array: true,
     nullable: false,

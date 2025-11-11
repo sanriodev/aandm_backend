@@ -32,6 +32,18 @@ export class DBUserService implements IUserService {
       return await this.userRepository.save(dto as DeepPartial<User>);
     }
   }
+
+  async updateActivitySetting(
+    publicActivity: boolean,
+    userId: string,
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new UnprocessableEntityException('User not found');
+    }
+    user.publicActivity = publicActivity;
+    return await this.userRepository.save(user);
+  }
   async findOneByUsernameWithPassword(username: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { username },
@@ -54,6 +66,12 @@ export class DBUserService implements IUserService {
     return await this.userRepository.findOne({
       where: { username },
       relations: ['roles'],
+    });
+  }
+
+  async findAllByActivityPrivacy(publicActivity: boolean): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { publicActivity },
     });
   }
   async getAllByIds(ids: string[]): Promise<User[]> {

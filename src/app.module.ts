@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RoleModule, UserAuthModule } from '@personal/user-auth';
 import { AppConfigModule, HealthModule } from '@personal/common';
@@ -9,11 +8,13 @@ import { DBUserModule } from './modules/user/user.module';
 import { DBUserService } from './modules/user/user.service';
 import { DBRolesService } from './modules/role/role.service';
 import { DBRoleModule } from './modules/role/role.module';
+import { ActivityModule } from './modules/activity/activity.module';
 
 const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
+    HealthModule,
     ConfigModule.forRoot({
       envFilePath: !ENV ? '.env' : `.env.${ENV}`,
       isGlobal: true,
@@ -32,7 +33,7 @@ const ENV = process.env.NODE_ENV;
       inject: [DBUserService],
       imports: [DBUserModule],
     }),
-    HealthModule,
+    ActivityModule,
   ],
   controllers: [],
   providers: [AppService],
