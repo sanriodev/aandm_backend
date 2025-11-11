@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.2.0...1.3.0) (2025-11-11)
+
+
+### Features
+
+* get activity event logs endpoint ([9c06ed4](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/9c06ed44baf12ec9b2a6366558fd1388cf0302a3))
+* load logger module ([ebb9475](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/ebb94752376169bf28b8ef65e287319be5545f2c))
+* logger endpoint for activity ([60d9fff](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/60d9fffdf03e55f70211f4cefae783f3fc7f077a))
+* update user activity ([4cc222a](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/4cc222ab1da05969d7e000326b590664c640a1be))
+* wip entity subscriber for logger service ([64f85c0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/64f85c0af314453937201f6b8035701dc7ca0758))
+
 ## [1.2.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.1.4...1.2.0) (2025-10-17)
 
 
