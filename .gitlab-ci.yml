@@ -1,90 +1,82 @@
-stages: [build, test, staging, scanning, release]
-
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/user/application_security/secret_detection/pipeline/configure
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+stages:
+- test
 default:
-  tags: [docker-build-01]
-
+  tags:
+  - docker-build-01
 variables:
-  OUTPUT_PATH: '$CI_PROJECT_DIR/artifacts'
-
-.before_docker:
+  OUTPUT_PATH: "$CI_PROJECT_DIR/artifacts"
+".before_docker":
   before_script:
-    # Auth using the built-in CI token (no Keychain touched)
-    - echo "$CI_TOKEN" | docker login "$CI_REGISTRY" -u "$CI_USER" --password-stdin
-
+  - echo "$CI_TOKEN" | docker login "$CI_REGISTRY" -u "$CI_USER" --password-stdin
 build_test_image:
   stage: build
-  extends: .before_docker
-  only: [dev, merge_requests]
+  extends: ".before_docker"
+  only:
+  - dev
+  - merge_requests
   script:
-    - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test" --push . --build-arg UserID=$(id -u) --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
-
+  - docker build -f dockerfiles/Dockerfile.test --provenance=false -t "$CI_REGISTRY_IMAGE:test"
+    --push . --build-arg UserID=$(id -u) --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/"
+    --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
 test_test_image:
   stage: test
-  extends: .before_docker
-  needs: [build_test_image]
-  only: [dev, merge_requests]
+  extends: ".before_docker"
+  needs:
+  - build_test_image
+  only:
+  - dev
+  - merge_requests
   script:
-    - mkdir -p artifacts
-    - docker run --rm "$CI_REGISTRY_IMAGE:test" npm run lint
-    - docker run --rm -v "$PWD/artifacts:/home/runner/artifacts" "$CI_REGISTRY_IMAGE:test" npm run test
+  - mkdir -p artifacts
+  - docker run --rm "$CI_REGISTRY_IMAGE:test" npm run lint
+  - docker run --rm -v "$PWD/artifacts:/home/runner/artifacts" "$CI_REGISTRY_IMAGE:test"
+    npm run test
   after_script:
-    - docker image rm -f "$CI_REGISTRY_IMAGE:test" || true
+  - docker image rm -f "$CI_REGISTRY_IMAGE:test" || true
   artifacts:
-    name: 'tests-and-coverage'
+    name: tests-and-coverage
     when: on_success
     reports:
       junit:
-        - '$OUTPUT_PATH/tests/junit-test-results.xml'
+      - "$OUTPUT_PATH/tests/junit-test-results.xml"
       coverage_report:
         coverage_format: cobertura
-        path: '$OUTPUT_PATH/coverage/cobertura-coverage.xml'
-
+        path: "$OUTPUT_PATH/coverage/cobertura-coverage.xml"
 build_staging_image:
   stage: staging
-  extends: .before_docker
-  only: [dev]
-  needs: [test_test_image]
+  extends: ".before_docker"
+  only:
+  - dev
+  needs:
+  - test_test_image
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
-    # Additional push to GHCR
-    - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
-    - docker tag "$CI_REGISTRY_IMAGE:staging" "ghcr.io/sanriodev/aandm_backend:staging"
-    - docker push "ghcr.io/sanriodev/aandm_backend:staging"
+  - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:staging"
+    --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/"
+    --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
+  - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+  - docker tag "$CI_REGISTRY_IMAGE:staging" "ghcr.io/sanriodev/aandm_backend:staging"
+  - docker push "ghcr.io/sanriodev/aandm_backend:staging"
 build_release_image:
   stage: release
-  extends: .before_docker
-  only: [tags]
+  extends: ".before_docker"
+  only:
+  - tags
   when: manual
   script:
-    - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" -t "$CI_REGISTRY_IMAGE:latest" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/" --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
-    # Additional push to GHCR
-    - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
-    - docker tag "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
-    - docker push "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
-# sast:
-#   stage: test
-#   tags:
-#     - docker-build-01
-
-# container_scanning_staging:
-#   extends: container_scanning
-#   stage: scanning
-#   needs:
-#     - build_staging_image
-#   rules:
-#   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     when: never
-#   - if: '$CI_COMMIT_REF_NAME == "dev"'
-#     when: always
-#   tags:
-#     - docker-build-01
-#   before_script:
-#     - export CS_IMAGE="git.blvckleg.dev:5050/personal/alinas-app/aandm_backend:staging"
-
-# container_scanning:
-#   rules:
-#     - when: never
-
-# include:
-# - template: Security/SAST.gitlab-ci.yml
-# - template: Jobs/Container-Scanning.gitlab-ci.yml
+  - docker build -f dockerfiles/Dockerfile --provenance=false -t "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}"
+    -t "$CI_REGISTRY_IMAGE:latest" --push . --build-arg "NPM_REGISTRY_EP=//git.blvckleg.dev/api/v4/packages/npm/"
+    --build-arg "NPM_ACCESS_TOKEN=${CI_TOKEN}"
+  - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USER" --password-stdin
+  - docker tag "$CI_REGISTRY_IMAGE:${CI_COMMIT_TAG}" "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
+  - docker push "ghcr.io/sanriodev/aandm_backend:${CI_COMMIT_TAG}"
+sast:
+  stage: test
+include:
+- template: Security/SAST.gitlab-ci.yml
