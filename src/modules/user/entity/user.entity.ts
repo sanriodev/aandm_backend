@@ -25,10 +25,10 @@ export class User extends IUser {
   })
   email: string;
 
-  @Column({})
+  @Column({ nullable: true })
   password: string;
 
-  @Column()
+  @Column({ nullable: true})
   salt: string;
 
   @Column({
