@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ApplicationController } from './application.controller';
 
 @Module({
-  imports: [],
+  imports: [AandmMailModule],
   controllers: [ApplicationController],
   providers: [],
   exports: [],
