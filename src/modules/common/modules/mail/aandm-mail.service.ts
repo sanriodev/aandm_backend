@@ -90,7 +90,7 @@ export class AandMMailService {
         from: this.emailConfigService.LoadedConfig.emailFrom,
         to: this.emailConfigService.LoadedConfig.adminEmail,
         subject: `Requesting Access`,
-        template: 'requestAccess',
+        template: 'request-access',
       } as IRMQSendMailOptions;
     }),
   };
