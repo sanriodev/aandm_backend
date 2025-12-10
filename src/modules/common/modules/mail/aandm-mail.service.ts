@@ -7,6 +7,7 @@ import {
 } from '@personal/common';
 import { User } from '../../../user/entity/user.entity';
 import { EmailConfigService } from '../../../../config/email/config.service';
+import { RequestAccessDto } from '../../../application/dto/request-access.dto';
 
 class MailTemplate {
   private _attachments: IRMQMailAttachment[] = [];
@@ -137,12 +138,12 @@ export class AandMMailService {
   //   await this.mailService.sendMail(mailMeta);
   // }
 
-  public async sendRequestAccessEmail(username: string, email: string) {
+  public async sendRequestAccessEmail(inputs: RequestAccessDto) {
     const mailTemplate = this.templates.requestAccess;
     const mailMeta: IRMQSendMailOptions = await mailTemplate
       .setReplacements({
-        username: username,
-        email: email,
+        username: inputs.username,
+        email: inputs.email,
       })
       .build(this.emailConfigService.LoadedConfig.adminEmail);
 
