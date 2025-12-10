@@ -9,6 +9,7 @@ import { DBUserService } from './modules/user/user.service';
 import { DBRolesService } from './modules/role/role.service';
 import { DBRoleModule } from './modules/role/role.module';
 import { ActivityModule } from './modules/activity/activity.module';
+import { ApplicationModule } from './modules/application/application.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -34,6 +35,7 @@ const ENV = process.env.NODE_ENV;
       imports: [DBUserModule],
     }),
     ActivityModule,
+    ApplicationModule,
   ],
   controllers: [],
   providers: [AppService],
