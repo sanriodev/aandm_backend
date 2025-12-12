@@ -35,9 +35,7 @@ export class ApplicationController {
     description: 'request a User to access the application',
   })
   @ApiBody({ type: RequestAccessDto })
-  async requesstAccess(
-    @Body() inputs: RequestAccessDto,
-  ): Promise<ReS<boolean>> {
+  async requesstAccess(@Body() inputs: RequestAccessDto): Promise<ReS<void>> {
     try {
       return ReS.FromData(await this.applicationService.requestAccess(inputs));
     } catch (error) {

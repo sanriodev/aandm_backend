@@ -28,7 +28,7 @@ export class User extends IUser {
   @Column({ nullable: true })
   password: string;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   salt: string;
 
   @Column({
