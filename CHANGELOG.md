@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.3.0...1.4.0) (2025-12-13)
+
+
+### Features
+
+* add invite and adjust other templates ([598c071](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/598c07134e724ead8751c09c94ceb87a56c4bac3))
+* make salt nullable for user invitation and random password logic ([7921df2](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/7921df20b6b170c6d3a403d231d4c1dab8936eba))
+* preparations for email reset pw ([e855f9b](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/e855f9b04a88c74c985a9efcacb28b23ec43f5aa))
+* request access template ([13b92b2](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/13b92b20b5b63772fcae9679745656460880e5b3))
+* wip email ([3eee2b4](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/3eee2b4e5eee83e6506c009dbba6d111c1a29a59))
+* wip mail for request access ([d66d243](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/d66d2431f8c9dc31514b774505f383758f810d7f))
+* wip mail service and module ([30a4a9c](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/30a4a9c9e9f6f5efa14bbd460e556bae0c018b66))
+* wip needs to be nullable for invite logic from user auth, creates empty user, then generates password/hash and updates it ([87edd91](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/87edd91a2a2341c7e841957e019b9b01aaae7e1b))
+
 ## [1.3.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.2.0...1.3.0) (2025-11-11)
 
 
