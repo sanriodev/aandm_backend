@@ -111,9 +111,18 @@ export class DBUserService implements IUserService {
     return u?.roles ?? [];
   }
   async create(createUserDto: ICreateUserMessage): Promise<User> {
-    return await this.userRepository.save<User>(
-      createUserDto as unknown as User,
-    );
+    const userData: any = { ...createUserDto };
+
+    // If roles are provided as IDs, fetch the actual role entities
+    if (createUserDto.roles && Array.isArray(createUserDto.roles)) {
+      const roleIds = createUserDto.roles as string[];
+      const roleRepository = this.userRepository.manager.getRepository(Role);
+      userData.roles = await roleRepository.find({
+        where: { id: In(roleIds) },
+      });
+    }
+
+    return await this.userRepository.save<User>(userData as User);
   }
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({ relations: ['roles'] });
