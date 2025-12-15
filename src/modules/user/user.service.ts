@@ -122,7 +122,9 @@ export class DBUserService implements IUserService {
       });
     }
 
-    return await this.userRepository.save<User>(userData as User);
+    return await this.userRepository.save<User>(userData as User, {
+      reload: true,
+    });
   }
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({ relations: ['roles'] });
