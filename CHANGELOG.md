@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.3](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.4.2...1.4.3) (2025-12-15)
+
+
+### Bug Fixes
+
+* overwrite logout because of a bug that causes user to lose role after logout, typeorm relational updates missing in generic core user-auth implementation ([3ae0912](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/3ae0912becec517082aae2f920a9bb1c4777eb2d))
+
 ### [1.4.2](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.4.1...1.4.2) (2025-12-15)
 
 
