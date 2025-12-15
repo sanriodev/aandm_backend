@@ -9,6 +9,7 @@ import { DeepPartial, In, Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { Role } from '../role/entity/role.entity';
 import { JWTUser } from '@personal/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 @Injectable()
 export class DBUserService implements IUserService {

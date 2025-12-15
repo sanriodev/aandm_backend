@@ -3,6 +3,7 @@ import {
   Inject,
   Post,
   Request,
+  UnprocessableEntityException,
   UseGuards,
   UseInterceptors,
   Version,
@@ -21,7 +22,6 @@ import {
   ResponseSanitizer,
 } from '@personal/common';
 import { AuthService } from '@personal/user-auth/src/auth/auth.service';
-import { IUserService } from '@personal/user-auth';
 import { LogoutResponseDto } from '@personal/user-auth/src/controller/v1/dto/logout-response.dto';
 import { DBUserService } from '../../../user/user.service';
 
@@ -57,6 +57,8 @@ export class AandMAuthController {
   async logout(@Request() req): Promise<LogoutResponseDto> {
     try {
       return await this.userService.logout(req.user.user ?? req.user);
-    } catch (e) {}
+    } catch (e) {
+      throw new UnprocessableEntityException(e.message);
+    }
   }
 }
