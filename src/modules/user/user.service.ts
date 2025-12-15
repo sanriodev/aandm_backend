@@ -111,6 +111,7 @@ export class DBUserService implements IUserService {
     return u?.roles ?? [];
   }
   async create(createUserDto: ICreateUserMessage): Promise<User> {
+    console.log('Creating user:', createUserDto);
     return await this.userRepository.save<User>(
       createUserDto as unknown as User,
     );
