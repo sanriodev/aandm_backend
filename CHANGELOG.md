@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.4.1...1.4.2) (2025-12-15)
+
+
+### Bug Fixes
+
+* correct template property ([8962fe1](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/8962fe1a3009f4c5ce8c466f4873eafedc1cf608))
+* create user roles ([a7ee58b](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/a7ee58bfb602f71e19e37320cc2903ab7f560b6f))
+* reload ([854ef17](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/854ef176d6fce83147a2f5feb8560ffbf6238f0c))
+
 ### [1.4.1](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.4.0...1.4.1) (2025-12-15)
 
 
