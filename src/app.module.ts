@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { RoleModule, UserAuthModule } from '@personal/user-auth';
+import { AuthController } from '@personal/user-auth/src/controller/v2/auth.controller';
 import { AppConfigModule, HealthModule } from '@personal/common';
 import { DatabaseProviderModule } from './provider/provider.module';
 import { ConfigModule } from '@nestjs/config';
@@ -10,6 +11,7 @@ import { DBRolesService } from './modules/role/role.service';
 import { DBRoleModule } from './modules/role/role.module';
 import { ActivityModule } from './modules/activity/activity.module';
 import { ApplicationModule } from './modules/application/application.module';
+import { AandMAuthController } from './modules/common/modules/auth/aandm-auth.controller';
 
 const ENV = process.env.NODE_ENV;
 
@@ -33,6 +35,7 @@ const ENV = process.env.NODE_ENV;
       },
       inject: [DBUserService],
       imports: [DBUserModule],
+      controllers: [AandMAuthController, AuthController],
     }),
     ActivityModule,
     ApplicationModule,

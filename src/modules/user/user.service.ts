@@ -8,6 +8,8 @@ import {
 import { DeepPartial, In, Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { Role } from '../role/entity/role.entity';
+import { JWTUser } from '@personal/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 @Injectable()
 export class DBUserService implements IUserService {
@@ -136,5 +138,14 @@ export class DBUserService implements IUserService {
       return true;
     }
     return false;
+  }
+
+  async logout(inputs: JWTUser): Promise<any> {
+    const user = await this.userRepository.findOne({
+      where: { id: inputs.id },
+    });
+    user.refreshTokens = [];
+    await this.userRepository.save(user);
+    return { message: 'Logged out successfully' };
   }
 }
