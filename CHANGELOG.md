@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.4.0...1.4.1) (2025-12-15)
+
+
+### Bug Fixes
+
+* include assets ([75c6742](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/commit/75c6742e7310c37d506138798854c6aac970425f))
+
 ## [1.4.0](https://git.blvckleg.dev/personal/alinas-app/aandm_backend/compare/1.3.0...1.4.0) (2025-12-13)
 
 
