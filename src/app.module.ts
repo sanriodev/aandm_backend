@@ -12,6 +12,7 @@ import { DBRoleModule } from './modules/role/role.module';
 import { ActivityModule } from './modules/activity/activity.module';
 import { ApplicationModule } from './modules/application/application.module';
 import { AandMAuthController } from './modules/common/modules/auth/aandm-auth.controller';
+import { UserController } from '@personal/user-auth/src/controller/v2/user.controller';
 
 const ENV = process.env.NODE_ENV;
 
@@ -35,7 +36,7 @@ const ENV = process.env.NODE_ENV;
       },
       inject: [DBUserService],
       imports: [DBUserModule],
-      controllers: [AandMAuthController, AuthController],
+      controllers: [AandMAuthController, AuthController, UserController],
     }),
     ActivityModule,
     ApplicationModule,
